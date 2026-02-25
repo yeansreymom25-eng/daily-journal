@@ -152,7 +152,6 @@ export default function LoginPage() {
                       Password
                     </label>
 
-                    {/* ✅ ONLY CHANGE: wrap input so we can place the eye icon */}
                     <div className="relative">
                       <input
                         type={showPassword ? "text" : "password"}
