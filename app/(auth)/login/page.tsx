@@ -2,32 +2,48 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  function onSubmit(e: React.FormEvent) {
+  // ✅ NEW: eye toggle state
+  const [showPassword, setShowPassword] = useState(false);
+
+  const [loading, setLoading] = useState(false);
+
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    alert(
-      `Login clicked\nEmail: ${email}\nPassword: ${"*".repeat(password.length)}`
-    );
+    setLoading(true);
+
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    setLoading(false);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    router.push("/dashboard");
   }
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
-      {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#fbe3b9] via-[#edd0ac] to-[#fbe3b9]" />
 
-      {/* ✅ TOP BAR (Auth = No Logout) */}
       <header className="relative w-full bg-[#4f252a] border-b border-[#3a1b1f] shadow-md">
         <div className="w-full px-10 py-5 flex items-center justify-between">
-          {/* Left: Brand (simple) */}
           <Link href="/" className="text-white font-bold text-xl tracking-wide">
             Daily Journal
           </Link>
 
-          {/* Right: Buttons */}
           <div className="flex items-center gap-4">
             <Link
               href="/"
@@ -46,11 +62,8 @@ export default function LoginPage() {
         </div>
       </header>
 
-      {/* ✅ BODY */}
       <main className="relative flex-1 flex">
-        {/* ✅ LEFT PANEL (Correct Auth Sidebar) */}
         <aside className="w-[460px] bg-[#fbe3b9] border-r border-[#e6c9a4] px-10 py-12 flex flex-col">
-          {/* Logo + Title */}
           <div className="flex flex-col items-start">
             <img
               src="/images/journal.png"
@@ -65,7 +78,6 @@ export default function LoginPage() {
             </p>
           </div>
 
-          {/* Benefits cards */}
           <div className="mt-10 space-y-4">
             <div className="rounded-2xl border border-black/10 bg-white/55 px-6 py-5">
               <div className="flex items-center gap-3 text-[#4f252a] font-bold text-lg">
@@ -95,7 +107,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Bottom image */}
           <div className="mt-auto pt-10">
             <img
               src="/images/book-flower.png"
@@ -105,9 +116,7 @@ export default function LoginPage() {
           </div>
         </aside>
 
-        {/* ✅ RIGHT SIDE (Form) */}
         <section className="flex-1 relative overflow-hidden">
-          {/* Soft blobs */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#edd0ac] via-[#fbe3b9] to-[#edd0ac]" />
           <div className="absolute -top-28 -right-28 h-80 w-80 rounded-full bg-[#e06464]/25 blur-3xl" />
           <div className="absolute -bottom-28 left-28 h-80 w-80 rounded-full bg-[#f1745e]/20 blur-3xl" />
@@ -124,7 +133,6 @@ export default function LoginPage() {
                 </p>
 
                 <form onSubmit={onSubmit} className="space-y-7">
-                  {/* Email */}
                   <div>
                     <label className="block text-base font-bold mb-3 text-[#4f252a]">
                       Email
@@ -134,29 +142,38 @@ export default function LoginPage() {
                       placeholder="Enter your email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full border border-black/15 rounded-2xl px-6 py-4 text-lg outline-none
-                                 focus:ring-2 focus:ring-[#e06464]/30 bg-white"
+                      className="w-full border border-black/15 rounded-2xl px-6 py-4 text-lg outline-none focus:ring-2 focus:ring-[#e06464]/30 bg-white"
                       required
                     />
                   </div>
 
-                  {/* Password */}
                   <div>
                     <label className="block text-base font-bold mb-3 text-[#4f252a]">
                       Password
                     </label>
-                    <input
-                      type="password"
-                      placeholder="Enter your password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full border border-black/15 rounded-2xl px-6 py-4 text-lg outline-none
-                                 focus:ring-2 focus:ring-[#e06464]/30 bg-white"
-                      required
-                    />
+
+                    {/* ✅ ONLY CHANGE: wrap input so we can place the eye icon */}
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Enter your password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full border border-black/15 rounded-2xl px-6 py-4 pr-14 text-lg outline-none focus:ring-2 focus:ring-[#e06464]/30 bg-white"
+                        required
+                      />
+
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((v) => !v)}
+                        className="absolute right-5 top-1/2 -translate-y-1/2 text-xl opacity-80 hover:opacity-100 transition"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? "🙈" : "👁️"}
+                      </button>
+                    </div>
                   </div>
 
-                  {/* Forgot */}
                   <div className="text-base">
                     <Link
                       href="/forgot-password"
@@ -166,19 +183,16 @@ export default function LoginPage() {
                     </Link>
                   </div>
 
-                  {/* Button */}
                   <div className="flex justify-center pt-2">
                     <button
                       type="submit"
-                      className="px-24 py-4 rounded-2xl text-lg font-extrabold text-white
-                                 bg-gradient-to-r from-[#e06464] to-[#f1745e]
-                                 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition"
+                      disabled={loading}
+                      className="px-24 py-4 rounded-2xl text-lg font-extrabold text-white bg-gradient-to-r from-[#e06464] to-[#f1745e] shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition disabled:opacity-60"
                     >
-                      Log In
+                      {loading ? "Logging in..." : "Log In"}
                     </button>
                   </div>
 
-                  {/* Sign up */}
                   <p className="text-center text-base text-[#4f252a]/70 pt-2">
                     Don&apos;t have an account?{" "}
                     <Link
@@ -195,7 +209,6 @@ export default function LoginPage() {
         </section>
       </main>
 
-      {/* ✅ FOOTER */}
       <footer className="relative w-full bg-[#4f252a] border-t border-[#3a1b1f]">
         <div className="w-full px-10 py-5 flex items-center justify-center gap-16 text-sm font-medium text-white">
           <div className="flex items-center gap-2">

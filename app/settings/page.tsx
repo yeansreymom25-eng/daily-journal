@@ -120,11 +120,12 @@ export default function SettingsPage() {
             >
               Delete Account
             </button>
+          </div>
 
-          </div>
-            <div className="px-6 pb-8">
+          {/* <div className="px-6 pb-8">
             <img src="/images/book-flower.png" alt="Book with flowers" className="w-full h-auto" />
-          </div>
+          </div> */}
+
         </div>
       </main>
     </div>

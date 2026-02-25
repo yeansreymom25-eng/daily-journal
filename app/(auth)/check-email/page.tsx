@@ -7,7 +7,6 @@ export default function CheckEmailPage() {
     <div className="min-h-screen flex flex-col relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-[#fbe3b9] via-[#edd0ac] to-[#fbe3b9]" />
 
-      {/* TOP BAR */}
       <header className="relative w-full bg-[#4f252a] border-b border-[#3a1b1f] shadow-md">
         <div className="w-full px-10 py-5 flex items-center justify-between">
           <Link href="/" className="text-white font-bold text-xl tracking-wide">
@@ -32,16 +31,11 @@ export default function CheckEmailPage() {
         </div>
       </header>
 
-      {/* CENTER CONTENT */}
       <main className="relative flex-1 flex items-center justify-center px-6">
         <div className="w-full max-w-[620px]">
           <div className="bg-white/80 backdrop-blur border border-black/15 rounded-2xl shadow-xl px-10 py-10 text-center">
             <div className="flex justify-center mb-5">
-              <img
-                src="/images/check-email.png"
-                alt="Check Email"
-                className="w-[120px] h-auto"
-              />
+              <img src="/images/check-email.png" alt="Check Email" className="w-[120px] h-auto" />
             </div>
 
             <h1 className="text-4xl font-extrabold text-[#4f252a] mb-4">
@@ -58,8 +52,7 @@ export default function CheckEmailPage() {
 
             <Link
               href="/login"
-              className="inline-flex items-center justify-center px-12 py-4 rounded-xl text-white font-extrabold
-                         bg-[#e06464] hover:bg-[#f1745e] transition shadow-sm"
+              className="inline-flex items-center justify-center px-12 py-4 rounded-xl text-white font-extrabold bg-[#e06464] hover:bg-[#f1745e] transition shadow-sm"
             >
               Back to Login
             </Link>
@@ -67,7 +60,6 @@ export default function CheckEmailPage() {
         </div>
       </main>
 
-      {/* FOOTER */}
       <footer className="relative w-full bg-[#4f252a] border-t border-[#3a1b1f]">
         <div className="w-full px-10 py-5 flex items-center justify-center gap-16 text-sm font-medium text-white">
           <div className="flex items-center gap-2">

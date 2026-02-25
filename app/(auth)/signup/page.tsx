@@ -2,14 +2,22 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { supabase } from "@/lib/supabase";
 
 export default function SignupPage() {
+  const router = useRouter();
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  function onSubmit(e: React.FormEvent) {
+  // ✅ NEW: eye toggle states
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     if (password !== confirmPassword) {
@@ -17,14 +25,38 @@ export default function SignupPage() {
       return;
     }
 
-    alert(`Sign Up clicked\nName: ${fullName}\nEmail: ${email}`);
+    setLoading(true);
+
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { full_name: fullName },
+      },
+    });
+
+    setLoading(false);
+
+    if (error) {
+      alert(error.message);
+      return;
+    }
+
+    // If email confirmation is ON, user may need to confirm.
+    // If it's OFF, user is immediately signed in.
+    if (!data.session) {
+      alert("Account created! Please check your email to confirm.");
+      router.push("/login");
+      return;
+    }
+
+    router.push("/dashboard");
   }
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-[#fbe3b9] via-[#edd0ac] to-[#fbe3b9]" />
 
-      {/* TOP BAR (Auth = no logout) */}
       <header className="relative w-full bg-[#4f252a] border-b border-[#3a1b1f] shadow-md">
         <div className="w-full px-10 py-5 flex items-center justify-between">
           <Link href="/" className="text-white font-bold text-xl tracking-wide">
@@ -49,9 +81,7 @@ export default function SignupPage() {
         </div>
       </header>
 
-      {/* BODY */}
       <main className="relative flex-1 flex">
-        {/* LEFT PANEL */}
         <aside className="w-[460px] bg-[#fbe3b9] border-r border-[#e6c9a4] px-10 py-12 flex flex-col">
           <div className="flex flex-col items-start">
             <img
@@ -63,7 +93,8 @@ export default function SignupPage() {
               Create your account
             </h2>
             <p className="mt-3 text-[#4f252a]/80 text-lg leading-relaxed">
-              Start journaling today. Save drafts, stay consistent, and track your mood.
+              Start journaling today. Save drafts, stay consistent, and track
+              your mood.
             </p>
           </div>
 
@@ -105,7 +136,6 @@ export default function SignupPage() {
           </div>
         </aside>
 
-        {/* RIGHT PANEL */}
         <section className="flex-1 relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-[#edd0ac] via-[#fbe3b9] to-[#edd0ac]" />
           <div className="absolute -top-28 -right-28 h-80 w-80 rounded-full bg-[#e06464]/25 blur-3xl" />
@@ -132,8 +162,7 @@ export default function SignupPage() {
                       placeholder="Enter your full name"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className="w-full border border-black/15 rounded-2xl px-6 py-4 text-lg outline-none
-                                 focus:ring-2 focus:ring-[#e06464]/30 bg-white"
+                      className="w-full border border-black/15 rounded-2xl px-6 py-4 text-lg outline-none focus:ring-2 focus:ring-[#e06464]/30 bg-white"
                       required
                     />
                   </div>
@@ -147,8 +176,7 @@ export default function SignupPage() {
                       placeholder="Enter your email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full border border-black/15 rounded-2xl px-6 py-4 text-lg outline-none
-                                 focus:ring-2 focus:ring-[#e06464]/30 bg-white"
+                      className="w-full border border-black/15 rounded-2xl px-6 py-4 text-lg outline-none focus:ring-2 focus:ring-[#e06464]/30 bg-white"
                       required
                     />
                   </div>
@@ -157,40 +185,63 @@ export default function SignupPage() {
                     <label className="block text-base font-bold mb-3 text-[#4f252a]">
                       Password
                     </label>
-                    <input
-                      type="password"
-                      placeholder="Create a password"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      className="w-full border border-black/15 rounded-2xl px-6 py-4 text-lg outline-none
-                                 focus:ring-2 focus:ring-[#e06464]/30 bg-white"
-                      required
-                    />
+
+                    {/* ✅ ONLY CHANGE: wrapper + eye icon */}
+                    <div className="relative">
+                      <input
+                        type={showPassword ? "text" : "password"}
+                        placeholder="Create a password"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        className="w-full border border-black/15 rounded-2xl px-6 py-4 pr-14 text-lg outline-none focus:ring-2 focus:ring-[#e06464]/30 bg-white"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword((v) => !v)}
+                        className="absolute right-5 top-1/2 -translate-y-1/2 text-xl opacity-80 hover:opacity-100 transition"
+                        aria-label={showPassword ? "Hide password" : "Show password"}
+                      >
+                        {showPassword ? "🙈" : "👁️"}
+                      </button>
+                    </div>
                   </div>
 
                   <div>
                     <label className="block text-base font-bold mb-3 text-[#4f252a]">
                       Confirm Password
                     </label>
-                    <input
-                      type="password"
-                      placeholder="Confirm your password"
-                      value={confirmPassword}
-                      onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full border border-black/15 rounded-2xl px-6 py-4 text-lg outline-none
-                                 focus:ring-2 focus:ring-[#e06464]/30 bg-white"
-                      required
-                    />
+
+                    {/* ✅ ONLY CHANGE: wrapper + eye icon */}
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="Confirm your password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="w-full border border-black/15 rounded-2xl px-6 py-4 pr-14 text-lg outline-none focus:ring-2 focus:ring-[#e06464]/30 bg-white"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword((v) => !v)}
+                        className="absolute right-5 top-1/2 -translate-y-1/2 text-xl opacity-80 hover:opacity-100 transition"
+                        aria-label={
+                          showConfirmPassword ? "Hide confirm password" : "Show confirm password"
+                        }
+                      >
+                        {showConfirmPassword ? "🙈" : "👁️"}
+                      </button>
+                    </div>
                   </div>
 
                   <div className="flex justify-center pt-2">
                     <button
                       type="submit"
-                      className="px-24 py-4 rounded-2xl text-lg font-extrabold text-white
-                                 bg-gradient-to-r from-[#e06464] to-[#f1745e]
-                                 shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition"
+                      disabled={loading}
+                      className="px-24 py-4 rounded-2xl text-lg font-extrabold text-white bg-gradient-to-r from-[#e06464] to-[#f1745e] shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition disabled:opacity-60"
                     >
-                      Create Account
+                      {loading ? "Creating..." : "Create Account"}
                     </button>
                   </div>
 
@@ -210,7 +261,6 @@ export default function SignupPage() {
         </section>
       </main>
 
-      {/* FOOTER */}
       <footer className="relative w-full bg-[#4f252a] border-t border-[#3a1b1f]">
         <div className="w-full px-10 py-5 flex items-center justify-center gap-16 text-sm font-medium text-white">
           <div className="flex items-center gap-2">
