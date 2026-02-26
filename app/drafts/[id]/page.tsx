@@ -141,9 +141,6 @@ export default function DraftDetailPage() {
               </div>
             </div>
 
-            <div className="text-4xl mt-2" style={{ color: COLORS.text }}>
-              📝
-            </div>
           </div>
 
           {/* Content Row */}
@@ -178,8 +175,8 @@ export default function DraftDetailPage() {
                 draggable={false}
                 style={{
                   position: "absolute",
-                  right: "-170px", // ✅ more to the right
-                  top: "40px",
+                  right: "20px", // more to the right
+                  top: "300px",
                   width: "560px",
                   height: "auto",
                   pointerEvents: "none",
