@@ -183,10 +183,10 @@ export default function DraftDetailPage() {
           </div>
 
           {/* Buttons */}
-          <div className="mt-6 shrink-0 flex items-center gap-8">
+          <div className="mt-8 flex items-center gap-6 justify-start">
             <button
               onClick={saveUIOnly}
-              className="px-14 py-4 rounded-xl text-2xl font-bold text-white transition"
+              className="px-12 py-4 rounded-xl text-xl font-bold text-white transition shadow-md"
               style={{ backgroundColor: COLORS.primary }}
               onMouseEnter={(e) => hoverPrimary(e, true)}
               onMouseLeave={(e) => hoverPrimary(e, false)}
@@ -196,7 +196,7 @@ export default function DraftDetailPage() {
 
             <button
               onClick={saveAsDraftUIOnly}
-              className="px-14 py-4 rounded-xl text-2xl font-bold border transition"
+              className="px-12 py-4 rounded-xl text-xl font-bold border transition shadow-sm"
               style={{
                 backgroundColor: COLORS.softWhite,
                 borderColor: COLORS.border,
@@ -208,7 +208,7 @@ export default function DraftDetailPage() {
 
             <button
               onClick={deleteUIOnly}
-              className="px-14 py-4 rounded-xl text-2xl font-bold border transition"
+              className="px-12 py-4 rounded-xl text-xl font-bold border transition shadow-sm"
               style={{
                 backgroundColor: COLORS.softWhite,
                 borderColor: COLORS.border,
