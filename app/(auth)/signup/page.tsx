@@ -129,10 +129,10 @@ export default function SignupPage() {
 
           <div className="mt-auto pt-10">
             <img
-              src="/images/book-flower.png"
-              alt="Book with flowers"
-              className="w-[380px] h-auto"
-            />
+  src="/images/Book-flower.png"
+  alt="Book with flowers"
+  className="w-[380px] h-auto"
+/>
           </div>
         </aside>
 
@@ -186,7 +186,7 @@ export default function SignupPage() {
                       Password
                     </label>
 
-                    {/* ✅ ONLY CHANGE: wrapper + eye icon */}
+                    {/* wrapper + eye icon */}
                     <div className="relative">
                       <input
                         type={showPassword ? "text" : "password"}
@@ -212,7 +212,7 @@ export default function SignupPage() {
                       Confirm Password
                     </label>
 
-                    {/* ✅ ONLY CHANGE: wrapper + eye icon */}
+                    {/*  wrapper + eye icon */}
                     <div className="relative">
                       <input
                         type={showConfirmPassword ? "text" : "password"}
