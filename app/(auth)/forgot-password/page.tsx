@@ -32,26 +32,26 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className="h-screen flex flex-col relative overflow-hidden">
+    <div className="min-h-screen md:h-screen flex flex-col relative overflow-hidden">
       <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#fbe3b9] via-[#edd0ac] to-[#fbe3b9]" />
 
       <header className="relative z-10 w-full h-[72px] bg-[#4f252a] border-b border-[#3a1b1f] shadow-md flex items-center">
-        <div className="w-full px-10 flex items-center justify-between">
+        <div className="w-full px-4 sm:px-6 md:px-10 flex items-center justify-between">
           <Link href="/" className="text-white font-bold text-xl tracking-wide">
             Daily Journal
           </Link>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             <Link
               href="/login"
-              className="bg-white/10 hover:bg-white/15 text-white text-sm px-5 py-2 rounded-lg font-semibold transition"
+              className="bg-white/10 hover:bg-white/15 text-white text-sm px-4 sm:px-5 py-2 rounded-lg font-semibold transition"
             >
               Back to Login
             </Link>
 
             <Link
               href="/signup"
-              className="bg-[#e06464] hover:bg-[#f1745e] text-white text-sm px-6 py-2 rounded-lg font-semibold shadow-sm transition"
+              className="bg-[#e06464] hover:bg-[#f1745e] text-white text-sm px-4 sm:px-6 py-2 rounded-lg font-semibold shadow-sm transition"
             >
               Sign Up
             </Link>
@@ -60,8 +60,8 @@ export default function ForgotPasswordPage() {
       </header>
 
       <main className="relative z-10 flex flex-1 overflow-hidden">
-        {/* ✅ Sidebar (same style as Login) */}
-        <aside className="relative z-10 w-[420px] bg-[#fbe3b9] border-r border-[#e6c9a4] px-8 py-8 flex flex-col overflow-hidden">
+        {/* Sidebar hidden on small */}
+        <aside className="hidden md:flex relative z-10 w-[420px] bg-[#fbe3b9] border-r border-[#e6c9a4] px-8 py-8 flex-col overflow-hidden">
           <div className="flex flex-col items-start">
             <img
               src="/images/journal.png"
@@ -87,29 +87,27 @@ export default function ForgotPasswordPage() {
             </div>
           </div>
 
-          {/* ✅ Book-flower: fixed bottom, same size, clean */}
           <div className="mt-auto pt-6">
             <img
               src="/images/Book-flower.png"
               alt="Book with flowers"
-              className="w-[320px] h-auto opacity-95 select-none pointer-events-none"
+              className="w-[320px] h-auto opacity-95"
             />
           </div>
         </aside>
 
-        {/* ✅ Right content */}
         <section className="flex-1 relative overflow-hidden">
-          <div className="absolute inset-0 z-0 pointer-events-none select-none bg-gradient-to-br from-[#edd0ac] via-[#fbe3b9] to-[#edd0ac]" />
-          <div className="absolute -top-28 -right-28 z-0 pointer-events-none select-none h-80 w-80 rounded-full bg-[#e06464]/25 blur-3xl" />
-          <div className="absolute -bottom-28 left-28 z-0 pointer-events-none select-none h-80 w-80 rounded-full bg-[#f1745e]/20 blur-3xl" />
+          <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-br from-[#edd0ac] via-[#fbe3b9] to-[#edd0ac]" />
+          <div className="absolute -top-28 -right-28 z-0 pointer-events-none h-80 w-80 rounded-full bg-[#e06464]/25 blur-3xl" />
+          <div className="absolute -bottom-28 left-28 z-0 pointer-events-none h-80 w-80 rounded-full bg-[#f1745e]/20 blur-3xl" />
 
-          <div className="relative z-10 h-full flex items-center justify-center px-10 py-6">
+          <div className="relative z-10 h-full flex items-center justify-center px-4 sm:px-6 md:px-10 py-6">
             <div className="w-full max-w-[680px]">
-              <h1 className="text-5xl font-extrabold text-[#4f252a] text-center mb-6">
+              <h1 className="text-4xl sm:text-5xl font-extrabold text-[#4f252a] text-center mb-6">
                 Reset Password
               </h1>
 
-              <div className="bg-white/90 backdrop-blur border border-black/10 rounded-3xl p-8 shadow-xl">
+              <div className="bg-white/90 backdrop-blur border border-black/10 rounded-3xl p-6 sm:p-8 shadow-xl">
                 <p className="text-center text-[#4f252a]/70 mb-6 text-base">
                   Enter your email and we’ll send a reset link
                 </p>
@@ -133,7 +131,7 @@ export default function ForgotPasswordPage() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="px-16 py-3 rounded-2xl text-base font-extrabold text-white bg-gradient-to-r from-[#e06464] to-[#f1745e] shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition disabled:opacity-60"
+                      className="px-12 sm:px-16 py-3 rounded-2xl text-base font-extrabold text-white bg-gradient-to-r from-[#e06464] to-[#f1745e] shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition disabled:opacity-60"
                     >
                       {loading ? "Sending..." : "Send Reset Link"}
                     </button>
@@ -150,20 +148,29 @@ export default function ForgotPasswordPage() {
                   </p>
                 </form>
               </div>
+
+              {/* Mobile-only Book-flower */}
+              <div className="md:hidden mt-8 flex justify-center">
+                <img
+                  src="/images/Book-flower.png"
+                  alt="Book with flowers"
+                  className="w-[280px] h-auto opacity-95"
+                />
+              </div>
             </div>
           </div>
         </section>
       </main>
 
       <footer className="relative z-10 w-full h-[60px] bg-[#4f252a] border-t border-[#3a1b1f] flex items-center">
-        <div className="w-full px-10 flex items-center justify-center gap-16 text-sm font-medium text-white">
+        <div className="w-full px-4 sm:px-6 md:px-10 flex items-center justify-center gap-6 sm:gap-10 md:gap-16 text-xs sm:text-sm font-medium text-white">
           <div className="flex items-center gap-2">
             <span className="text-lg">🛡️</span> Secure Data
           </div>
           <div className="flex items-center gap-2">
             <span className="text-lg">💗</span> Free to use
           </div>
-          <div className="flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-2">
             <span className="text-lg">📱</span> Sync across devices
           </div>
         </div>

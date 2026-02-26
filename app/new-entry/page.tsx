@@ -39,16 +39,9 @@ export default function NewEntryPage() {
   }
 
   return (
-    <div
-      className="h-screen overflow-hidden flex flex-col relative"
-      style={{ background: COLORS.bg }}
-    >
-      {/* ===================== TOP BAR ===================== */}
-      <header
-        className="w-full border-b shadow-md flex-shrink-0"
-        style={{ background: COLORS.top }}
-      >
-        <div className="w-full px-10 py-3 flex justify-end">
+    <div className="min-h-screen md:h-screen overflow-hidden flex flex-col relative" style={{ background: COLORS.bg }}>
+      <header className="w-full border-b shadow-md flex-shrink-0" style={{ background: COLORS.top }}>
+        <div className="w-full px-4 sm:px-6 md:px-10 py-3 flex justify-end">
           <button
             onClick={() => alert("Logout (UI only)")}
             className="text-white font-bold px-6 py-2 rounded-xl text-base transition"
@@ -59,11 +52,8 @@ export default function NewEntryPage() {
         </div>
       </header>
 
-      {/* ===================== CONTENT ===================== */}
-      <main className="flex-1 flex justify-center items-start px-8 py-6 relative">
+      <main className="flex-1 flex justify-center items-start px-4 sm:px-6 md:px-8 py-6 relative overflow-auto md:overflow-hidden">
         <div className="w-full max-w-[1100px] relative">
-          
-          {/* Back */}
           <button
             onClick={() => router.back()}
             className="text-2xl font-extrabold mb-3 flex items-center gap-2"
@@ -72,13 +62,8 @@ export default function NewEntryPage() {
             ← Back
           </button>
 
-          {/* ===================== WHITE CARD ===================== */}
-          <div
-            className="bg-white rounded-3xl shadow-xl overflow-hidden"
-            style={{ border: `1.5px solid ${COLORS.cardBorder}` }}
-          >
-            {/* Title */}
-            <div className="px-10 py-4 border-b flex items-center gap-4">
+          <div className="bg-white rounded-3xl shadow-xl overflow-hidden" style={{ border: `1.5px solid ${COLORS.cardBorder}` }}>
+            <div className="px-6 sm:px-10 py-4 border-b flex items-center gap-4">
               <span className="text-3xl">🏷️</span>
               <input
                 value={title}
@@ -89,8 +74,7 @@ export default function NewEntryPage() {
               />
             </div>
 
-            {/* Emoji Grid */}
-            <div className="px-10 py-4 border-b">
+            <div className="px-6 sm:px-10 py-4 border-b">
               <div className="flex flex-wrap gap-3">
                 {emojis.map((em) => {
                   const active = selectedEmoji === em;
@@ -101,12 +85,8 @@ export default function NewEntryPage() {
                       onClick={() => setSelectedEmoji(em)}
                       className="text-2xl rounded-xl px-4 py-2 transition border shadow-sm"
                       style={{
-                        borderColor: active
-                          ? COLORS.primary
-                          : "rgba(79,37,42,0.15)",
-                        background: active
-                          ? "rgba(241,116,94,0.15)"
-                          : "white",
+                        borderColor: active ? COLORS.primary : "rgba(79,37,42,0.15)",
+                        background: active ? "rgba(241,116,94,0.15)" : "white",
                       }}
                     >
                       {em}
@@ -116,46 +96,38 @@ export default function NewEntryPage() {
               </div>
             </div>
 
-            {/* Textarea */}
-            <div className="px-10 py-5">
+            <div className="px-6 sm:px-10 py-5">
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Start writing here..."
-                className="w-full h-[240px] text-lg outline-none resize-none"
+                className="w-full h-[220px] sm:h-[240px] md:h-[260px] text-lg outline-none resize-none"
                 style={{ color: "#333" }}
               />
             </div>
           </div>
 
-          {/* CLOCK */}
-            <img
-              src="/images/clock.png"
-              alt="Clock"
-              className="absolute right-[-180px] top-[-5px] w-[270px] h-auto select-none pointer-events-none"
-              draggable={false}
-            />
+          {/* CLOCK: only on large screens so it won’t break small screens */}
+          <img
+            src="/images/clock.png"
+            alt="Clock"
+            className="hidden lg:block absolute right-[-180px] top-[-5px] w-[270px] h-auto select-none pointer-events-none"
+            draggable={false}
+          />
 
-          {/* BUTTONS  */}
-          <div className="flex justify-center gap-10 mt-6">
+          <div className="flex justify-center gap-6 sm:gap-10 mt-6 flex-wrap">
             <button
               onClick={onSave}
-              className="px-16 py-4 rounded-2xl font-extrabold text-lg transition shadow-md"
-              style={{
-                background: COLORS.primary,
-                color: "white",
-              }}
+              className="px-12 sm:px-16 py-4 rounded-2xl font-extrabold text-lg transition shadow-md"
+              style={{ background: COLORS.primary, color: "white" }}
             >
               Save
             </button>
 
             <button
               onClick={onSaveDraft}
-              className="px-14 py-4 rounded-2xl font-extrabold text-lg transition shadow-md"
-              style={{
-                background: "#d9d9d9",
-                color: "#111",
-              }}
+              className="px-12 sm:px-14 py-4 rounded-2xl font-extrabold text-lg transition shadow-md"
+              style={{ background: "#d9d9d9", color: "#111" }}
             >
               Save as Draft
             </button>

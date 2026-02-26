@@ -45,8 +45,7 @@ export default function EntryDetailPage() {
         preview: "Today I studied and I feel...",
         date: "February 20, 2026",
         mood: "🥹",
-        content:
-          "Today I studied and I feel proud. I will keep going step by step.",
+        content: "Today I studied and I feel proud. I will keep going step by step.",
       },
       {
         id: "3",
@@ -54,8 +53,7 @@ export default function EntryDetailPage() {
         preview: "It was not easy today because...",
         date: "February 20, 2026",
         mood: "🥲",
-        content:
-          "It was not easy today, but I learned something and I will try again tomorrow.",
+        content: "It was not easy today, but I learned something and I will try again tomorrow.",
       },
     ],
     []
@@ -63,23 +61,14 @@ export default function EntryDetailPage() {
 
   const entry = entries.find((e) => e.id === id) || entries[0];
 
-  const hoverPrimary = (
-    e: React.MouseEvent<HTMLButtonElement>,
-    on: boolean
-  ) => {
-    e.currentTarget.style.backgroundColor = on
-      ? COLORS.primaryHover
-      : COLORS.primary;
+  const hoverPrimary = (e: React.MouseEvent<HTMLButtonElement>, on: boolean) => {
+    e.currentTarget.style.backgroundColor = on ? COLORS.primaryHover : COLORS.primary;
   };
 
   return (
-    <div
-      className="h-screen flex flex-col overflow-hidden"
-      style={{ backgroundColor: COLORS.bg }}
-    >
-      {/* TOP BAR */}
+    <div className="min-h-screen md:h-screen flex flex-col overflow-hidden" style={{ backgroundColor: COLORS.bg }}>
       <header className="w-full flex-shrink-0" style={{ backgroundColor: COLORS.top }}>
-        <div className="w-full px-10 py-4 flex items-center justify-end">
+        <div className="w-full px-4 sm:px-6 md:px-10 py-4 flex items-center justify-end">
           <button
             onClick={() => alert("Logout (UI only)")}
             className="text-white font-bold px-5 py-2 rounded-lg transition"
@@ -92,56 +81,49 @@ export default function EntryDetailPage() {
         </div>
       </header>
 
-      {/* BODY */}
-      <main className="flex-1 overflow-hidden px-10 py-6">
+      <main className="flex-1 overflow-hidden px-4 sm:px-6 md:px-10 py-6">
         <div className="mx-auto w-full max-w-6xl h-full flex flex-col">
-          {/* Header Row */}
           <div className="flex items-center justify-between flex-shrink-0">
-            <div className="flex items-center gap-6">
+            <div className="flex items-center gap-4 sm:gap-6 min-w-0">
               <button
                 onClick={() => router.push("/dashboard")}
-                className="text-6xl font-bold leading-none"
+                className="text-5xl sm:text-6xl font-bold leading-none"
                 style={{ color: COLORS.text }}
               >
                 ←
               </button>
 
-              <div>
-                <div className="flex items-center gap-4">
-                  <h1 className="text-6xl font-extrabold" style={{ color: COLORS.text }}>
+              <div className="min-w-0">
+                <div className="flex items-center gap-3 sm:gap-4">
+                  <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold truncate" style={{ color: COLORS.text }}>
                     {entry.title}
                   </h1>
-                  <span className="text-5xl">{entry.mood}</span>
+                  <span className="text-4xl sm:text-5xl">{entry.mood}</span>
                 </div>
 
-                <div
-                  className="mt-2 text-3xl"
-                  style={{ color: "rgba(79,37,42,0.55)" }}
-                >
+                <div className="mt-2 text-xl sm:text-2xl md:text-3xl" style={{ color: "rgba(79,37,42,0.55)" }}>
                   {entry.date}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Main Content Row */}
-          <div className="mt-6 flex-1 flex gap-10 items-start overflow-hidden">
-            {/* Big text box */}
+          <div className="mt-6 flex-1 flex gap-6 lg:gap-10 items-start overflow-hidden flex-col lg:flex-row">
             <div
-              className="flex-1 rounded-2xl border p-10 h-full overflow-hidden"
+              className="flex-1 rounded-2xl border p-6 sm:p-10 h-full overflow-hidden w-full"
               style={{
                 backgroundColor: COLORS.card,
                 borderColor: COLORS.border,
                 boxShadow: "0 18px 35px rgba(79,37,42,0.18)",
               }}
             >
-              <p className="text-3xl leading-relaxed" style={{ color: COLORS.text }}>
+              <p className="text-xl sm:text-2xl md:text-3xl leading-relaxed" style={{ color: COLORS.text }}>
                 {entry.content}
               </p>
             </div>
 
-            {/* Image area (relative so absolute works correctly) */}
-            <div className="w-[360px] relative h-full overflow-hidden">
+            {/* Coffee image only on large screens */}
+            <div className="hidden lg:block w-[360px] relative h-full overflow-hidden">
               <img
                 src="/images/coffee.png"
                 alt="Coffee"
@@ -151,11 +133,10 @@ export default function EntryDetailPage() {
             </div>
           </div>
 
-          {/* Buttons */}
-          <div className="mt-6 flex items-center gap-10 flex-shrink-0">
+          <div className="mt-6 flex items-center gap-4 sm:gap-10 flex-shrink-0 flex-wrap">
             <button
               onClick={() => alert("Edit (UI only)")}
-              className="px-16 py-5 rounded-xl text-3xl font-bold text-white transition"
+              className="px-10 sm:px-16 py-4 sm:py-5 rounded-xl text-xl sm:text-3xl font-bold text-white transition"
               style={{ backgroundColor: COLORS.primary }}
               onMouseEnter={(e) => hoverPrimary(e, true)}
               onMouseLeave={(e) => hoverPrimary(e, false)}
@@ -165,7 +146,7 @@ export default function EntryDetailPage() {
 
             <button
               onClick={() => alert("Delete (UI only)")}
-              className="px-16 py-5 rounded-xl text-3xl font-bold border transition"
+              className="px-10 sm:px-16 py-4 sm:py-5 rounded-xl text-xl sm:text-3xl font-bold border transition"
               style={{
                 backgroundColor: "rgba(255,255,255,0.55)",
                 borderColor: COLORS.border,

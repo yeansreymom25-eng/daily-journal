@@ -14,57 +14,34 @@ export default function SettingsPage() {
   };
 
   return (
-    <div
-      className="min-h-screen flex flex-col"
-      style={{ backgroundColor: COLORS.bg }}
-    >
-      {/* TOP BAR */}
-      <header
-        className="w-full border-b shadow-md"
-        style={{ backgroundColor: COLORS.top }}
-      >
-        <div className="w-full px-8 py-4 flex items-center justify-between">
-          <button
-            onClick={() => router.back()}
-            className="text-white text-lg font-semibold"
-          >
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: COLORS.bg }}>
+      <header className="w-full border-b shadow-md" style={{ backgroundColor: COLORS.top }}>
+        <div className="w-full px-4 sm:px-6 md:px-8 py-4 flex items-center justify-between">
+          <button onClick={() => router.back()} className="text-white text-base sm:text-lg font-semibold">
             ← Back
           </button>
 
           <button
-            className="px-5 py-2 rounded-lg text-white font-bold"
+            className="px-4 sm:px-5 py-2 rounded-lg text-white font-bold text-sm sm:text-base"
             style={{ backgroundColor: COLORS.primary }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor = COLORS.primaryHover)
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = COLORS.primary)
-            }
+            onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = COLORS.primaryHover)}
+            onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = COLORS.primary)}
           >
             Log Out
           </button>
         </div>
       </header>
 
-      {/* CENTERED CONTENT */}
-      <main className="flex-1 flex flex-col items-center justify-center px-6">
-
-        {/* TITLE */}
-        <h1
-          className="text-6xl font-extrabold mb-10 text-center"
-          style={{ color: COLORS.text }}
-        >
+      <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6">
+        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-8 sm:mb-10 text-center" style={{ color: COLORS.text }}>
           Settings
         </h1>
 
-        {/* CARD */}
-        <div className="bg-white rounded-2xl shadow-lg border p-10 w-full max-w-2xl">
-
-          <p className="text-gray-600 mb-8 text-center">
+        <div className="bg-white rounded-2xl shadow-lg border p-6 sm:p-10 w-full max-w-2xl">
+          <p className="text-gray-600 mb-8 text-center text-sm sm:text-base">
             Manage your account preferences (UI only for now).
           </p>
 
-          {/* DISPLAY NAME */}
           <div className="mb-6">
             <label className="block mb-2 font-semibold text-gray-800">
               Display Name
@@ -76,7 +53,6 @@ export default function SettingsPage() {
             />
           </div>
 
-          {/* EMAIL */}
           <div className="mb-8">
             <label className="block mb-2 font-semibold text-gray-800">
               Email
@@ -88,18 +64,12 @@ export default function SettingsPage() {
             />
           </div>
 
-          {/* BUTTONS */}
           <div className="flex flex-col sm:flex-row justify-center gap-4">
-
             <button
               className="px-6 py-3 rounded-lg text-white font-bold"
               style={{ backgroundColor: COLORS.primary }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor = COLORS.primaryHover)
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.backgroundColor = COLORS.primary)
-              }
+              onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = COLORS.primaryHover)}
+              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = COLORS.primary)}
             >
               Save Changes
             </button>
@@ -115,17 +85,10 @@ export default function SettingsPage() {
               Change Password
             </button>
 
-            <button
-              className="px-6 py-3 rounded-lg font-bold border border-red-400 text-red-600"
-            >
+            <button className="px-6 py-3 rounded-lg font-bold border border-red-400 text-red-600">
               Delete Account
             </button>
           </div>
-
-          {/* <div className="px-6 pb-8">
-            <img src="/images/book-flower.png" alt="Book with flowers" className="w-full h-auto" />
-          </div> */}
-
         </div>
       </main>
     </div>
