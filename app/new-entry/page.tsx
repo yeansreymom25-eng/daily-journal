@@ -132,7 +132,7 @@ export default function NewEntryPage() {
             <img
               src="/images/clock.png"
               alt="Clock"
-              className="absolute right-[-120px] top-[5px] w-[270px] h-auto select-none pointer-events-none"
+              className="absolute right-[-160px] top-[5px] w-[270px] h-auto select-none pointer-events-none"
               draggable={false}
             />
 
