@@ -50,14 +50,12 @@ export default function SignupPage() {
 
     router.push("/dashboard");
   }
-
   return (
-    // ✅ FULL SCREEN + NO SCROLL
+
     <div className="h-screen flex flex-col relative overflow-hidden">
-      {/* ✅ background always behind */}
+
       <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#fbe3b9] via-[#edd0ac] to-[#fbe3b9]" />
 
-      {/* ✅ fixed header height */}
       <header className="relative z-10 w-full h-[72px] bg-[#4f252a] border-b border-[#3a1b1f] shadow-md flex items-center">
         <div className="w-full px-10 flex items-center justify-between">
           <Link href="/" className="text-white font-bold text-xl tracking-wide">
@@ -82,9 +80,9 @@ export default function SignupPage() {
         </div>
       </header>
 
-      {/* ✅ main fills remaining space, no overflow */}
+
       <main className="relative z-10 flex flex-1 overflow-hidden">
-        {/* ✅ aside scroll is OFF, content fits */}
+     
         <aside className="relative z-10 w-[420px] bg-[#fbe3b9] border-r border-[#e6c9a4] px-8 py-8 flex flex-col overflow-hidden">
           <div className="flex flex-col items-start">
             <img
@@ -130,9 +128,9 @@ export default function SignupPage() {
             </div>
           </div>
 
-          {/* ✅ keep the flower visible without scrolling */}
+          {/* flower*/}
           <div className="mt-auto pt-6">
-            <img
+         <img
               src="/images/Book-flower.png"
               alt="Book with flowers"
               className="w-[320px] h-auto opacity-95"
@@ -140,20 +138,19 @@ export default function SignupPage() {
           </div>
         </aside>
 
-        {/* ✅ right section with backgrounds behind */}
         <section className="flex-1 relative overflow-hidden">
           <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-br from-[#edd0ac] via-[#fbe3b9] to-[#edd0ac]" />
           <div className="absolute -top-28 -right-28 z-0 pointer-events-none h-80 w-80 rounded-full bg-[#e06464]/25 blur-3xl" />
           <div className="absolute -bottom-28 left-28 z-0 pointer-events-none h-80 w-80 rounded-full bg-[#f1745e]/20 blur-3xl" />
 
-          {/* ✅ reduce padding so no vertical scroll */}
+      
           <div className="relative z-10 h-full flex items-center justify-center px-10 py-6">
             <div className="w-full max-w-[680px]">
               <h1 className="text-5xl font-extrabold text-[#4f252a] text-center mb-6">
                 Sign Up
               </h1>
 
-              {/* ✅ smaller card padding */}
+              {/*card*/}
               <div className="bg-white/90 backdrop-blur border border-black/10 rounded-3xl p-8 shadow-xl">
                 <p className="text-center text-[#4f252a]/70 mb-6 text-base">
                   Please enter your details below
@@ -268,7 +265,7 @@ export default function SignupPage() {
         </section>
       </main>
 
-      {/* ✅ fixed footer height */}
+      {/*footer */}
       <footer className="relative z-10 w-full h-[60px] bg-[#4f252a] border-t border-[#3a1b1f] flex items-center">
         <div className="w-full px-10 flex items-center justify-center gap-16 text-sm font-medium text-white">
           <div className="flex items-center gap-2">
