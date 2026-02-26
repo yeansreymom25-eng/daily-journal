@@ -74,9 +74,12 @@ export default function EntryDetailPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: COLORS.bg }}>
+    <div
+      className="h-screen flex flex-col overflow-hidden"
+      style={{ backgroundColor: COLORS.bg }}
+    >
       {/* TOP BAR */}
-      <header className="w-full" style={{ backgroundColor: COLORS.top }}>
+      <header className="w-full flex-shrink-0" style={{ backgroundColor: COLORS.top }}>
         <div className="w-full px-10 py-4 flex items-center justify-end">
           <button
             onClick={() => alert("Logout (UI only)")}
@@ -91,10 +94,10 @@ export default function EntryDetailPage() {
       </header>
 
       {/* BODY */}
-      <main className="flex-1 px-10 py-10">
-        <div className="mx-auto w-full max-w-6xl">
-          {/* Header Row (big back + title + right icons) */}
-          <div className="flex items-center justify-between">
+      <main className="flex-1 overflow-hidden px-10 py-6">
+        <div className="mx-auto w-full max-w-6xl h-full flex flex-col">
+          {/* Header Row */}
+          <div className="flex items-center justify-between flex-shrink-0">
             <div className="flex items-center gap-6">
               <button
                 onClick={() => router.push("/dashboard")}
@@ -113,7 +116,7 @@ export default function EntryDetailPage() {
                 </div>
 
                 <div
-                  className="mt-3 text-3xl"
+                  className="mt-2 text-3xl"
                   style={{ color: "rgba(79,37,42,0.55)" }}
                 >
                   {entry.date}
@@ -122,11 +125,11 @@ export default function EntryDetailPage() {
             </div>
           </div>
 
-          {/* Main Content Row (Text box + Image like your UI) */}
-          <div className="mt-10 flex gap-10 items-start">
+          {/* Main Content Row */}
+          <div className="mt-6 flex-1 flex gap-10 items-start overflow-hidden">
             {/* Big text box */}
             <div
-              className="flex-1 rounded-2xl border p-10"
+              className="flex-1 rounded-2xl border p-10 h-full overflow-hidden"
               style={{
                 backgroundColor: COLORS.card,
                 borderColor: COLORS.border,
@@ -138,18 +141,19 @@ export default function EntryDetailPage() {
               </p>
             </div>
 
-            {/* Image on the right */}
-            <div className="w-[360px] flex items-center justify-center">
+            {/* Image area (relative so absolute works correctly) */}
+            <div className="w-[360px] relative h-full overflow-hidden">
               <img
                 src="/images/coffee.png"
                 alt="Coffee"
-                className="absolute right-200 top-130 w-[600px] h-auto"
+                className="absolute right-[-220px] top-[-40px] w-[640px] h-auto select-none pointer-events-none"
+                draggable={false}
               />
             </div>
           </div>
 
-          {/* Buttons (under text box, left side like your UI) */}
-          <div className="mt-10 flex items-center gap-10">
+          {/* Buttons */}
+          <div className="mt-6 flex items-center gap-10 flex-shrink-0">
             <button
               onClick={() => alert("Edit (UI only)")}
               className="px-16 py-5 rounded-xl text-3xl font-bold text-white transition"
