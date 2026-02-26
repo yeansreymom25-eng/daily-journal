@@ -1,21 +1,20 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 
 type Draft = {
   id: string;
-  title: string | null;
-  content: string | null;
-  mood: string | null;
-  created_at: string | null;
+  title: string;
+  date: string;
+  mood: string;
+  content: string;
 };
 
 export default function DraftDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const id = String(params?.id || "");
+  const id = String(params?.id || "1");
 
   const COLORS = {
     bg: "#edd0ac",
@@ -28,130 +27,71 @@ export default function DraftDetailPage() {
     softWhite: "rgba(255,255,255,0.55)",
   };
 
-  const [loading, setLoading] = useState(true);
-  const [draft, setDraft] = useState<Draft | null>(null);
+  // ✅ UUID checker (prevents "d1" crash)
+  const isUUID = (v: string) =>
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(
+      v
+    );
 
-  const [title, setTitle] = useState<string>("Draft");
-  const [content, setContent] = useState<string>("");
+  // UI-only demo drafts (use simple ids like "1", "2", "3")
+  const drafts: Draft[] = useMemo(
+    () => [
+      {
+        id: "1",
+        title: "Draft: Study plan",
+        date: "February 19, 2026",
+        mood: "✨",
+        content: "Start writing your draft...",
+      },
+      {
+        id: "2",
+        title: "Draft: My feelings",
+        date: "February 19, 2026",
+        mood: "💭",
+        content: "I feel a bit tired but...",
+      },
+      {
+        id: "3",
+        title: "Draft: Goals",
+        date: "February 19, 2026",
+        mood: "🎯",
+        content: "This month I want to improve...",
+      },
+    ],
+    []
+  );
 
-  useEffect(() => {
-    (async () => {
-      setLoading(true);
+  const isNew = id === "new";
 
-      const { data: { user } } = await supabase.auth.getUser();
-      if (!user) {
-        router.push("/login");
-        return;
-      }
+  // ✅ If id is not UUID, we safely use UI demo draft
+  const current = drafts.find((d) => d.id === id) || drafts[0];
 
-      const { data, error } = await supabase
-        .from("drafts")
-        .select("id,title,content,mood,created_at,user_id")
-        .eq("id", id)
-        .single();
-
-      if (error) {
-        alert(error.message);
-        router.push("/drafts");
-        return;
-      }
-
-      // basic safety check (RLS should protect too)
-      if (!data) {
-        router.push("/drafts");
-        return;
-      }
-
-      setDraft(data as any);
-      setTitle((data as any).title || "Draft");
-      setContent((data as any).content || "");
-      setLoading(false);
-    })();
-  }, [id, router]);
+  const [title, setTitle] = useState<string>(
+    isNew ? "Draft: New idea" : current.title
+  );
+  const [content, setContent] = useState<string>(isNew ? "" : current.content);
 
   const hoverPrimary = (e: React.MouseEvent<HTMLButtonElement>, on: boolean) => {
-    e.currentTarget.style.backgroundColor = on ? COLORS.primaryHover : COLORS.primary;
+    e.currentTarget.style.backgroundColor = on
+      ? COLORS.primaryHover
+      : COLORS.primary;
   };
 
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    router.push("/login");
-  }
-
-  async function saveDraft() {
-    const { error } = await supabase
-      .from("drafts")
-      .update({
-        title: title.trim(),
-        content,
-        updated_at: new Date().toISOString(),
-      })
-      .eq("id", id);
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    alert("Saved ✅");
-  }
-
-  async function deleteDraft() {
-    const ok = confirm("Delete this draft?");
-    if (!ok) return;
-
-    const { error } = await supabase.from("drafts").delete().eq("id", id);
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
+  const saveUIOnly = () => alert("Saved (UI only). Backend later with Supabase ✅");
+  const saveAsDraftUIOnly = () =>
+    alert("Saved as Draft (UI only). Backend later with Supabase ✅");
+  const deleteUIOnly = () => {
+    alert("Deleted (UI only). Backend later with Supabase ✅");
     router.push("/drafts");
-  }
-
-  async function publishDraft() {
-    if (!draft) return;
-
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      router.push("/login");
-      return;
-    }
-
-    // Create entry
-    const { error: insertErr } = await supabase.from("journal_entries").insert({
-      user_id: user.id,
-      title: title.trim(),
-      content,
-      mood: draft.mood || null,
-    });
-
-    if (insertErr) {
-      alert(insertErr.message);
-      return;
-    }
-
-    // Delete draft after publish
-    const { error: delErr } = await supabase.from("drafts").delete().eq("id", id);
-    if (delErr) {
-      alert(delErr.message);
-      return;
-    }
-
-    router.push("/dashboard");
-  }
-
-  if (loading) {
-    return <div className="p-10 text-lg">Loading...</div>;
-  }
+  };
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: COLORS.bg }}>
+    <div className="h-screen flex flex-col" style={{ backgroundColor: COLORS.bg }}>
       {/* TOP BAR */}
-      <header className="w-full" style={{ backgroundColor: COLORS.top }}>
+      <header className="w-full shrink-0" style={{ backgroundColor: COLORS.top }}>
         <div className="w-full px-10 py-4 flex items-center justify-end">
           <button
-            onClick={handleLogout}
+            onClick={() => alert("Logout (UI only)")}
             className="text-white font-bold px-5 py-2 rounded-lg transition"
             style={{ backgroundColor: COLORS.primary }}
             onMouseEnter={(e) => hoverPrimary(e, true)}
@@ -162,15 +102,15 @@ export default function DraftDetailPage() {
         </div>
       </header>
 
-      {/* BODY */}
-      <main className="flex-1 px-10 py-10">
-        <div className="mx-auto w-full max-w-6xl">
+      {/* BODY (fit in one screen) */}
+      <main className="flex-1 overflow-hidden px-10 py-6">
+        <div className="mx-auto w-full max-w-6xl h-full flex flex-col">
           {/* Header */}
-          <div className="flex items-start justify-between">
+          <div className="flex items-start justify-between shrink-0">
             <div className="flex items-start gap-6">
               <button
                 onClick={() => router.push("/drafts")}
-                className="text-6xl font-bold leading-none mt-2"
+                className="text-6xl font-bold leading-none mt-1"
                 style={{ color: COLORS.text }}
               >
                 ←
@@ -178,62 +118,82 @@ export default function DraftDetailPage() {
 
               <div>
                 <div className="flex items-center gap-4">
-                  <h1 className="text-6xl font-extrabold" style={{ color: COLORS.text }}>
-                    <input
-                      value={title}
-                      onChange={(e) => setTitle(e.target.value)}
-                      className="bg-transparent outline-none"
-                      style={{ color: COLORS.text }}
-                    />
+                  <h1
+                    className="text-5xl font-extrabold"
+                    style={{ color: COLORS.text }}
+                  >
+                    {title}
                   </h1>
-                  <span className="text-5xl">{draft?.mood || "📝"}</span>
+                  <span className="text-5xl">{isNew ? "✨" : current.mood}</span>
                 </div>
 
-                <div className="mt-3 text-3xl" style={{ color: "rgba(79,37,42,0.55)" }}>
-                  {draft?.created_at ? new Date(draft.created_at).toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }) : ""}
+                <div
+                  className="mt-2 text-2xl"
+                  style={{ color: "rgba(79,37,42,0.55)" }}
+                >
+                  {isNew ? "February 19, 2026" : current.date}
                 </div>
+
+                {/* Optional: show info if id is UUID or not */}
+                {/* <div className="mt-1 text-sm opacity-70" style={{ color: COLORS.text }}>
+                  {isUUID(id) ? "UUID route (ready for DB)" : "UI demo route"}
+                </div> */}
               </div>
             </div>
 
-            <div className="text-4xl mt-3" style={{ color: COLORS.text }}>
+            <div className="text-4xl mt-2" style={{ color: COLORS.text }}>
               📝
             </div>
           </div>
 
           {/* Content Row */}
-          <div className="mt-10 flex gap-12 items-start">
+          <div className="mt-6 flex-1 flex gap-10 items-start overflow-hidden relative">
+            {/* Text box */}
             <div
-              className="flex-1 rounded-2xl border"
+              className="flex-1 rounded-2xl border overflow-hidden"
               style={{
                 backgroundColor: COLORS.card,
                 borderColor: COLORS.border,
                 boxShadow: "0 18px 35px rgba(79,37,42,0.18)",
-                overflow: "hidden",
               }}
             >
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Start writing your draft..."
-                className="w-full min-h-[320px] p-10 text-3xl leading-relaxed outline-none resize-none"
-                style={{ backgroundColor: "transparent", color: COLORS.text }}
+                className="w-full h-full p-8 text-2xl leading-relaxed outline-none resize-none"
+                style={{
+                  backgroundColor: "transparent",
+                  color: COLORS.text,
+                  minHeight: "360px",
+                }}
               />
             </div>
 
-            <div className="w-[360px] flex items-center justify-center">
+            {/* Coffee image (move more right + keep visible) */}
+            <div className="w-[360px] relative shrink-0">
               <img
                 src="/images/coffee.png"
                 alt="Coffee"
-                className="absolute right-150 top-130 w-[600px] h-auto"
+                draggable={false}
+                style={{
+                  position: "absolute",
+                  right: "-170px", // ✅ more to the right
+                  top: "40px",
+                  width: "560px",
+                  height: "auto",
+                  pointerEvents: "none",
+                  userSelect: "none",
+                }}
               />
             </div>
           </div>
 
           {/* Buttons */}
-          <div className="mt-10 flex items-center gap-10">
+          <div className="mt-6 shrink-0 flex items-center gap-8">
             <button
-              onClick={saveDraft}
-              className="px-16 py-5 rounded-xl text-3xl font-bold text-white transition"
+              onClick={saveUIOnly}
+              className="px-14 py-4 rounded-xl text-2xl font-bold text-white transition"
               style={{ backgroundColor: COLORS.primary }}
               onMouseEnter={(e) => hoverPrimary(e, true)}
               onMouseLeave={(e) => hoverPrimary(e, false)}
@@ -242,20 +202,20 @@ export default function DraftDetailPage() {
             </button>
 
             <button
-              onClick={publishDraft}
-              className="px-16 py-5 rounded-xl text-3xl font-bold border transition"
+              onClick={saveAsDraftUIOnly}
+              className="px-14 py-4 rounded-xl text-2xl font-bold border transition"
               style={{
                 backgroundColor: COLORS.softWhite,
                 borderColor: COLORS.border,
                 color: COLORS.text,
               }}
             >
-              Publish
+              Save as Draft
             </button>
 
             <button
-              onClick={deleteDraft}
-              className="px-16 py-5 rounded-xl text-3xl font-bold border transition"
+              onClick={deleteUIOnly}
+              className="px-14 py-4 rounded-xl text-2xl font-bold border transition"
               style={{
                 backgroundColor: COLORS.softWhite,
                 borderColor: COLORS.border,
