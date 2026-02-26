@@ -10,7 +10,6 @@ export default function NewEntryPage() {
     bg: "#edd0ac",
     top: "#4f252a",
     primary: "#f1745e",
-    primaryHover: "#e06464",
     text: "#4f252a",
     cardBorder: "rgba(79,37,42,0.25)",
   };
@@ -41,10 +40,10 @@ export default function NewEntryPage() {
 
   return (
     <div
-      className="h-screen overflow-hidden flex flex-col"
+      className="h-screen overflow-hidden flex flex-col relative"
       style={{ background: COLORS.bg }}
     >
-      {/* TOP BAR */}
+      {/* ===================== TOP BAR ===================== */}
       <header
         className="w-full border-b shadow-md flex-shrink-0"
         style={{ background: COLORS.top }}
@@ -60,9 +59,10 @@ export default function NewEntryPage() {
         </div>
       </header>
 
-      {/* CONTENT */}
-      <main className="flex-1 overflow-hidden flex justify-center items-start px-8 py-6">
-        <div className="w-full max-w-[1050px] h-full overflow-hidden">
+      {/* ===================== CONTENT ===================== */}
+      <main className="flex-1 flex justify-center items-start px-8 py-6 relative">
+        <div className="w-full max-w-[1100px] relative">
+          
           {/* Back */}
           <button
             onClick={() => router.back()}
@@ -72,19 +72,11 @@ export default function NewEntryPage() {
             ← Back
           </button>
 
-          {/* WHITE BOX */}
+          {/* ===================== WHITE CARD ===================== */}
           <div
-            className="bg-white rounded-3xl shadow-xl overflow-hidden relative"
+            className="bg-white rounded-3xl shadow-xl overflow-hidden"
             style={{ border: `1.5px solid ${COLORS.cardBorder}` }}
           >
-            {/* Clock (moved right + inside box) */}
-            <img
-              src="/images/clock.png"
-              alt="Clock"
-              className="absolute right-6 top-6 w-[230px] h-auto select-none pointer-events-none"
-              draggable={false}
-            />
-
             {/* Title */}
             <div className="px-10 py-4 border-b flex items-center gap-4">
               <span className="text-3xl">🏷️</span>
@@ -130,13 +122,21 @@ export default function NewEntryPage() {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Start writing here..."
-                className="w-full h-[240px] lg:h-[260px] text-lg outline-none resize-none"
+                className="w-full h-[240px] text-lg outline-none resize-none"
                 style={{ color: "#333" }}
               />
             </div>
           </div>
 
-          {/* Buttons */}
+          {/* ===================== CLOCK (OUTSIDE CARD) ===================== */}
+          <img
+            src="/images/clock.png"
+            alt="Clock"
+            className="absolute right-[-60px] top-[10px] w-[270px] h-auto select-none pointer-events-none"
+            draggable={false}
+          />
+
+          {/* ===================== BUTTONS ===================== */}
           <div className="flex justify-center gap-10 mt-6">
             <button
               onClick={onSave}
