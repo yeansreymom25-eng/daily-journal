@@ -124,11 +124,12 @@ export default function EntryDetailPage() {
 
             {/* Coffee image only on large screens */}
             <div className="hidden lg:block w-[360px] relative h-full overflow-hidden">
-              <img
+             <img
                 src="/images/coffee.png"
                 alt="Coffee"
-                className="absolute right-[20px] top-[200px] w-[1000px] h-auto select-none pointer-events-none"
+                className="w-[420px] h-auto select-none"
                 draggable={false}
+                style={{ marginLeft: "-60px", marginTop: "20px" }}
               />
             </div>
           </div>
