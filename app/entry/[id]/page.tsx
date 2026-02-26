@@ -146,7 +146,7 @@ export default function EntryDetailPage() {
               <img
                 src="/images/coffee.png"
                 alt="Coffee"
-                className="absolute right-[5px] top-[200px] w-[1000px] h-auto select-none pointer-events-none"
+                className="absolute right-[20px] top-[300px] w-[1000px] h-auto select-none pointer-events-none"
                 draggable={false}
               />
             </div>
