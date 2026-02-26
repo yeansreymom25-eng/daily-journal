@@ -10,7 +10,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // ✅ NEW: eye toggle state
+  // eye toggle state
   const [showPassword, setShowPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
@@ -36,31 +36,34 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#fbe3b9] via-[#edd0ac] to-[#fbe3b9]" />
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#fbe3b9] via-[#edd0ac] to-[#fbe3b9]" />
 
-      <header className="relative w-full bg-[#4f252a] border-b border-[#3a1b1f] shadow-md">
-        <div className="w-full px-10 py-5 flex items-center justify-between">
-          <Link href="/" className="text-white font-bold text-xl tracking-wide">
-            Daily Journal
-          </Link>
+     <header className="relative z-10 w-full bg-[#4f252a] border-b border-[#3a1b1f] shadow-md">
+  <div className="w-full px-10 py-5 flex items-center justify-between">
+    <Link
+      href="/"
+      className="text-white font-bold text-xl tracking-wide"
+    >
+      Daily Journal
+    </Link>
 
-          <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              className="bg-white/10 hover:bg-white/15 text-white text-sm px-5 py-2 rounded-lg font-semibold transition"
-            >
-              Back to Home
-            </Link>
+    <div className="flex items-center gap-4">
+      <Link
+        href="/"
+        className="bg-white/10 hover:bg-white/15 text-white text-sm px-5 py-2 rounded-lg font-semibold transition"
+      >
+        Back to Home
+      </Link>
 
-            <Link
-              href="/signup"
-              className="bg-[#e06464] hover:bg-[#f1745e] text-white text-sm px-6 py-2 rounded-lg font-semibold shadow-sm transition"
-            >
-              Sign Up
-            </Link>
-          </div>
-        </div>
-      </header>
+      <Link
+        href="/signup"
+        className="bg-[#e06464] hover:bg-[#f1745e] text-white text-sm px-6 py-2 rounded-lg font-semibold shadow-sm transition"
+      >
+        Sign Up
+      </Link>
+    </div>
+  </div>
+</header>
 
       <main className="relative flex-1 flex">
         <aside className="w-[460px] bg-[#fbe3b9] border-r border-[#e6c9a4] px-10 py-12 flex flex-col">
