@@ -80,7 +80,11 @@ export default function ForgotPasswordPage() {
           </div>
 
           <div className="mt-auto pt-10">
-            <img src="/images/book-flower.png" alt="Book with flowers" className="w-[380px] h-auto" />
+               <img
+              src="/images/Book-flower.png"
+              alt="Book with flowers"
+              className="w-[380px] h-auto"
+            />
           </div>
         </aside>
 

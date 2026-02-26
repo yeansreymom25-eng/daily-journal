@@ -111,8 +111,8 @@ export default function LoginPage() {
           </div>
 
           <div className="mt-auto pt-10">
-            <img
-              src="/images/book-flower.png"
+               <img
+              src="/images/Book-flower.png"
               alt="Book with flowers"
               className="w-[380px] h-auto"
             />
