@@ -5,29 +5,46 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter();
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
-  // eye toggle state
-  const [showPassword, setShowPassword] = useState(false);
-
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+
+  // eye toggle states
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+
+    if (password !== confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
+
     setLoading(true);
 
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signUp({
       email,
       password,
+      options: {
+        data: { full_name: fullName },
+      },
     });
 
     setLoading(false);
 
     if (error) {
       alert(error.message);
+      return;
+    }
+
+    if (!data.session) {
+      alert("Account created! Please check your email to confirm.");
+      router.push("/login");
       return;
     }
 
@@ -53,17 +70,17 @@ export default function LoginPage() {
             </Link>
 
             <Link
-              href="/signup"
+              href="/login"
               className="bg-[#e06464] hover:bg-[#f1745e] text-white text-sm px-4 sm:px-6 py-2 rounded-lg font-semibold shadow-sm transition"
             >
-              Sign Up
+              Login
             </Link>
           </div>
         </div>
       </header>
 
-      <main className="relative z-10 flex-1 flex overflow-hidden">
-        {/* Sidebar: hidden on small screens */}
+      <main className="relative z-10 flex flex-1 overflow-hidden">
+        {/* Sidebar hidden on small */}
         <aside className="hidden md:flex relative z-10 w-[420px] bg-[#fbe3b9] border-r border-[#e6c9a4] px-8 py-8 flex-col overflow-hidden">
           <div className="flex flex-col items-start">
             <img
@@ -72,38 +89,38 @@ export default function LoginPage() {
               className="w-[110px] h-auto"
             />
             <h2 className="mt-5 text-3xl font-extrabold text-[#4f252a]">
-              Welcome back
+              Create your account
             </h2>
             <p className="mt-2 text-[#4f252a]/80 text-base leading-relaxed">
-              Log in to continue writing, saving drafts, and tracking your mood.
+              Start journaling today. Save drafts, stay consistent, and track your mood.
             </p>
           </div>
 
           <div className="mt-7 space-y-3">
             <div className="rounded-2xl border border-black/10 bg-white/55 px-5 py-4">
               <div className="flex items-center gap-3 text-[#4f252a] font-bold text-base">
-                <span className="text-lg">🔒</span> Private & secure
+                <span className="text-lg">✨</span> Simple & calming
               </div>
               <p className="mt-1 text-[#4f252a]/75 text-sm">
-                Your entries stay safe and personal.
+                Clean UI to help you focus on writing.
               </p>
             </div>
 
             <div className="rounded-2xl border border-black/10 bg-white/55 px-5 py-4">
               <div className="flex items-center gap-3 text-[#4f252a] font-bold text-base">
-                <span className="text-lg">📝</span> Draft anytime
+                <span className="text-lg">🔒</span> Private by design
               </div>
               <p className="mt-1 text-[#4f252a]/75 text-sm">
-                Save unfinished thoughts and come back later.
+                Your journal stays personal and secure.
               </p>
             </div>
 
             <div className="rounded-2xl border border-black/10 bg-white/55 px-5 py-4">
               <div className="flex items-center gap-3 text-[#4f252a] font-bold text-base">
-                <span className="text-lg">📱</span> Sync across devices
+                <span className="text-lg">📱</span> Use anywhere
               </div>
               <p className="mt-1 text-[#4f252a]/75 text-sm">
-                Use it anywhere—phone, tablet, or laptop.
+                Phone, tablet, or laptop—your journal follows you.
               </p>
             </div>
           </div>
@@ -125,15 +142,29 @@ export default function LoginPage() {
           <div className="relative z-10 h-full flex items-center justify-center px-4 sm:px-6 md:px-10 py-6">
             <div className="w-full max-w-[680px]">
               <h1 className="text-4xl sm:text-5xl font-extrabold text-[#4f252a] text-center mb-6">
-                Log In
+                Sign Up
               </h1>
 
               <div className="bg-white/90 backdrop-blur border border-black/10 rounded-3xl p-6 sm:p-8 shadow-xl">
                 <p className="text-center text-[#4f252a]/70 mb-6 text-base">
-                  Please enter your login details below
+                  Please enter your details below
                 </p>
 
                 <form onSubmit={onSubmit} className="space-y-5">
+                  <div>
+                    <label className="block text-sm font-bold mb-2 text-[#4f252a]">
+                      Full Name
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="Enter your full name"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      className="w-full border border-black/15 rounded-2xl px-5 py-3 text-base outline-none focus:ring-2 focus:ring-[#e06464]/30 bg-white"
+                      required
+                    />
+                  </div>
+
                   <div>
                     <label className="block text-sm font-bold mb-2 text-[#4f252a]">
                       Email
@@ -156,13 +187,12 @@ export default function LoginPage() {
                     <div className="relative">
                       <input
                         type={showPassword ? "text" : "password"}
-                        placeholder="Enter your password"
+                        placeholder="Create a password"
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         className="w-full border border-black/15 rounded-2xl px-5 py-3 pr-14 text-base outline-none focus:ring-2 focus:ring-[#e06464]/30 bg-white"
                         required
                       />
-
                       <button
                         type="button"
                         onClick={() => setShowPassword((v) => !v)}
@@ -174,13 +204,33 @@ export default function LoginPage() {
                     </div>
                   </div>
 
-                  <div className="text-base">
-                    <Link
-                      href="/forgot-password"
-                      className="text-[#4f252a] underline font-semibold hover:text-[#e06464] transition"
-                    >
-                      Forgot Password?
-                    </Link>
+                  <div>
+                    <label className="block text-sm font-bold mb-2 text-[#4f252a]">
+                      Confirm Password
+                    </label>
+
+                    <div className="relative">
+                      <input
+                        type={showConfirmPassword ? "text" : "password"}
+                        placeholder="Confirm your password"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        className="w-full border border-black/15 rounded-2xl px-5 py-3 pr-14 text-base outline-none focus:ring-2 focus:ring-[#e06464]/30 bg-white"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowConfirmPassword((v) => !v)}
+                        className="absolute right-5 top-1/2 -translate-y-1/2 text-lg opacity-80 hover:opacity-100 transition"
+                        aria-label={
+                          showConfirmPassword
+                            ? "Hide confirm password"
+                            : "Show confirm password"
+                        }
+                      >
+                        {showConfirmPassword ? "🙈" : "👁️"}
+                      </button>
+                    </div>
                   </div>
 
                   <div className="flex justify-center pt-2">
@@ -189,23 +239,23 @@ export default function LoginPage() {
                       disabled={loading}
                       className="px-14 sm:px-20 py-3 rounded-2xl text-base font-extrabold text-white bg-gradient-to-r from-[#e06464] to-[#f1745e] shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition disabled:opacity-60"
                     >
-                      {loading ? "Logging in..." : "Log In"}
+                      {loading ? "Creating..." : "Create Account"}
                     </button>
                   </div>
 
                   <p className="text-center text-sm text-[#4f252a]/70 pt-1">
-                    Don&apos;t have an account?{" "}
+                    Already have an account?{" "}
                     <Link
-                      href="/signup"
+                      href="/login"
                       className="text-[#e06464] underline font-extrabold"
                     >
-                      Sign Up
+                      Log In
                     </Link>
                   </p>
                 </form>
               </div>
 
-              {/* Mobile-only Book-flower so it still appears */}
+              {/* Mobile-only Book-flower */}
               <div className="md:hidden mt-8 flex justify-center">
                 <img
                   src="/images/Book-flower.png"
