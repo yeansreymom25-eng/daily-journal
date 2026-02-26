@@ -128,15 +128,15 @@ export default function NewEntryPage() {
             </div>
           </div>
 
-          {/* ===================== CLOCK (OUTSIDE CARD) ===================== */}
-          <img
-            src="/images/clock.png"
-            alt="Clock"
-            className="absolute right-[-60px] top-[10px] w-[270px] h-auto select-none pointer-events-none"
-            draggable={false}
-          />
+          {/* CLOCK */}
+            <img
+              src="/images/clock.png"
+              alt="Clock"
+              className="absolute right-[-120px] top-[5px] w-[270px] h-auto select-none pointer-events-none"
+              draggable={false}
+            />
 
-          {/* ===================== BUTTONS ===================== */}
+          {/* BUTTONS  */}
           <div className="flex justify-center gap-10 mt-6">
             <button
               onClick={onSave}
