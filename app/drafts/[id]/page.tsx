@@ -59,7 +59,6 @@ export default function DraftDetailPage() {
   const isNew = id === "new";
   const current = drafts.find((d) => d.id === id) || drafts[0];
 
-  // ✅ editable
   const [title, setTitle] = useState<string>(
     isNew ? "Draft: New idea" : current.title
   );
@@ -138,14 +137,11 @@ export default function DraftDetailPage() {
               </div>
             </div>
 
-            <div className="text-4xl mt-3" style={{ color: COLORS.text }}>
-              📝
-            </div>
           </div>
 
           {/* Content Row */}
           <div className="mt-10 flex gap-12 items-start flex-1 overflow-hidden">
-            {/* LEFT COLUMN (textarea + buttons) */}
+            {/* LEFT COLUMN */}
             <div className="flex-1 flex flex-col min-w-0">
               {/* Text box */}
               <div
@@ -169,7 +165,6 @@ export default function DraftDetailPage() {
                 />
               </div>
 
-              {/* ✅ Buttons moved UP (directly under textarea) */}
               <div className="mt-7 flex items-center gap-6">
                 <button
                   onClick={saveUIOnly}
@@ -209,15 +204,18 @@ export default function DraftDetailPage() {
 
             {/* RIGHT COLUMN (coffee image) */}
             <div className="w-[420px] relative flex items-start justify-center">
-              <img
-                src="/images/coffee.png"
-                alt="Coffee"
-                className="w-[420px] h-auto select-none"
-                draggable={false}
-                style={{
-                  transform: "translateX(40px) translateY(40px)",
-                }}
-              />
+         <div className="w-[420px] relative flex items-start justify-start">
+          <img
+            src="/images/coffee.png"
+            alt="Coffee"
+            className="w-[420px] h-auto select-none"
+            draggable={false}
+            style={{
+              marginLeft: "-60px",   //  moves image LEFT
+              marginTop: "20px",     // small vertical adjustment
+            }}
+          />
+        </div>
             </div>
           </div>
         </div>
