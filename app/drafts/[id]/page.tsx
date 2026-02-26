@@ -134,10 +134,6 @@ export default function DraftDetailPage() {
                   {isNew ? "February 19, 2026" : current.date}
                 </div>
 
-                {/* Optional: show info if id is UUID or not */}
-                {/* <div className="mt-1 text-sm opacity-70" style={{ color: COLORS.text }}>
-                  {isUUID(id) ? "UUID route (ready for DB)" : "UI demo route"}
-                </div> */}
               </div>
             </div>
 
@@ -176,7 +172,7 @@ export default function DraftDetailPage() {
                 style={{
                   position: "absolute",
                   right: "20px", // more to the right
-                  top: "300px",
+                  top: "150px",
                   width: "560px",
                   height: "auto",
                   pointerEvents: "none",
