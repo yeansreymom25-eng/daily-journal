@@ -17,7 +17,6 @@ export default function EntryDetailPage() {
   const params = useParams();
   const id = String(params?.id || "1");
 
-  // ✅ SAME PALETTE (keep consistent)
   const COLORS = {
     bg: "#edd0ac",
     top: "#4f252a",
@@ -146,7 +145,7 @@ export default function EntryDetailPage() {
               <img
                 src="/images/coffee.png"
                 alt="Coffee"
-                className="absolute right-[20px] top-[300px] w-[1000px] h-auto select-none pointer-events-none"
+                className="absolute right-[-60px] top-[20px] w-[1000px] h-auto select-none pointer-events-none"
                 draggable={false}
               />
             </div>
