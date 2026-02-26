@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
 
 export default function NewEntryPage() {
   const router = useRouter();
@@ -19,7 +18,6 @@ export default function NewEntryPage() {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [selectedEmoji, setSelectedEmoji] = useState<string>("");
-  const [loading, setLoading] = useState(false);
 
   const emojis = useMemo(
     () => [
@@ -31,52 +29,29 @@ export default function NewEntryPage() {
     []
   );
 
-  async function handleLogout() {
-    await supabase.auth.signOut();
-    router.push("/login");
+  function onSave() {
+    alert("Saved (UI only)");
+    router.push("/dashboard");
   }
 
-  async function handleSave(isDraft: boolean) {
-    if (!title.trim() || !content.trim()) {
-      alert("Please fill Title and Content.");
-      return;
-    }
-
-    setLoading(true);
-
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      setLoading(false);
-      router.push("/login");
-      return;
-    }
-
-    const table = isDraft ? "drafts" : "journal_entries";
-
-    const { error } = await supabase.from(table).insert({
-      user_id: user.id,
-      title: title.trim(),
-      content: content.trim(),
-      mood: selectedEmoji || null,
-    });
-
-    setLoading(false);
-
-    if (error) {
-      alert(error.message);
-      return;
-    }
-
-    router.push(isDraft ? "/drafts" : "/dashboard");
+  function onSaveDraft() {
+    alert("Saved as Draft (UI only)");
+    router.push("/drafts");
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ background: COLORS.bg }}>
+    <div
+      className="h-screen overflow-hidden flex flex-col"
+      style={{ background: COLORS.bg }}
+    >
       {/* TOP BAR */}
-      <header className="w-full border-b shadow-md" style={{ background: COLORS.top }}>
-        <div className="w-full px-10 py-4 flex justify-end">
+      <header
+        className="w-full border-b shadow-md flex-shrink-0"
+        style={{ background: COLORS.top }}
+      >
+        <div className="w-full px-10 py-3 flex justify-end">
           <button
-            onClick={handleLogout}
+            onClick={() => alert("Logout (UI only)")}
             className="text-white font-bold px-6 py-2 rounded-xl text-base transition"
             style={{ background: COLORS.primary }}
           >
@@ -86,12 +61,12 @@ export default function NewEntryPage() {
       </header>
 
       {/* CONTENT */}
-      <main className="flex-1 flex justify-center items-start py-12 px-8">
-        <div className="w-full max-w-[1050px]">
+      <main className="flex-1 overflow-hidden flex justify-center items-start px-8 py-6">
+        <div className="w-full max-w-[1050px] h-full overflow-hidden">
           {/* Back */}
           <button
             onClick={() => router.back()}
-            className="text-3xl font-extrabold mb-5 flex items-center gap-2"
+            className="text-2xl font-extrabold mb-3 flex items-center gap-2"
             style={{ color: COLORS.text }}
           >
             ← Back
@@ -102,21 +77,29 @@ export default function NewEntryPage() {
             className="bg-white rounded-3xl shadow-xl overflow-hidden relative"
             style={{ border: `1.5px solid ${COLORS.cardBorder}` }}
           >
+            {/* Clock (moved right + inside box) */}
+            <img
+              src="/images/clock.png"
+              alt="Clock"
+              className="absolute right-6 top-6 w-[230px] h-auto select-none pointer-events-none"
+              draggable={false}
+            />
+
             {/* Title */}
-            <div className="px-12 py-6 border-b flex items-center gap-4">
+            <div className="px-10 py-4 border-b flex items-center gap-4">
               <span className="text-3xl">🏷️</span>
               <input
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
                 placeholder="Title"
-                className="w-full text-3xl font-bold outline-none"
+                className="w-full text-2xl font-bold outline-none"
                 style={{ color: COLORS.text }}
               />
             </div>
 
             {/* Emoji Grid */}
-            <div className="px-12 py-6 border-b">
-              <div className="flex flex-wrap gap-5">
+            <div className="px-10 py-4 border-b">
+              <div className="flex flex-wrap gap-3">
                 {emojis.map((em) => {
                   const active = selectedEmoji === em;
                   return (
@@ -126,8 +109,12 @@ export default function NewEntryPage() {
                       onClick={() => setSelectedEmoji(em)}
                       className="text-2xl rounded-xl px-4 py-2 transition border shadow-sm"
                       style={{
-                        borderColor: active ? COLORS.primary : "rgba(79,37,42,0.15)",
-                        background: active ? "rgba(241,116,94,0.15)" : "white",
+                        borderColor: active
+                          ? COLORS.primary
+                          : "rgba(79,37,42,0.15)",
+                        background: active
+                          ? "rgba(241,116,94,0.15)"
+                          : "white",
                       }}
                     >
                       {em}
@@ -138,45 +125,41 @@ export default function NewEntryPage() {
             </div>
 
             {/* Textarea */}
-            <div className="px-12 py-8">
+            <div className="px-10 py-5">
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Start writing here..."
-                className="w-full h-[320px] text-xl outline-none resize-none"
+                className="w-full h-[240px] lg:h-[260px] text-lg outline-none resize-none"
                 style={{ color: "#333" }}
               />
             </div>
           </div>
 
           {/* Buttons */}
-          <div className="flex justify-center gap-12 mt-10">
+          <div className="flex justify-center gap-10 mt-6">
             <button
-              onClick={() => handleSave(false)}
-              disabled={loading}
-              className="px-20 py-5 rounded-2xl font-extrabold text-xl transition shadow-md disabled:opacity-60"
-              style={{ background: COLORS.primary, color: "white" }}
+              onClick={onSave}
+              className="px-16 py-4 rounded-2xl font-extrabold text-lg transition shadow-md"
+              style={{
+                background: COLORS.primary,
+                color: "white",
+              }}
             >
-              {loading ? "Saving..." : "Save"}
+              Save
             </button>
 
             <button
-              onClick={() => handleSave(true)}
-              disabled={loading}
-              className="px-16 py-5 rounded-2xl font-extrabold text-xl transition shadow-md disabled:opacity-60"
-              style={{ background: "#d9d9d9", color: "#111" }}
+              onClick={onSaveDraft}
+              className="px-14 py-4 rounded-2xl font-extrabold text-lg transition shadow-md"
+              style={{
+                background: "#d9d9d9",
+                color: "#111",
+              }}
             >
-              {loading ? "Saving..." : "Save as Draft"}
+              Save as Draft
             </button>
           </div>
-
-          {/* Clock */}
-          <img
-            src="/images/clock.png"
-            alt="Clock"
-            className="absolute right-140 top-15 w-[300px] h-auto"
-            draggable={false}
-          />
         </div>
       </main>
     </div>
