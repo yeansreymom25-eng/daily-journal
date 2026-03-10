@@ -26,6 +26,8 @@ export default function EntryDetailPage() {
   const [mood, setMood] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(true);
+  const [deleting, setDeleting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const loadEntry = async () => {
@@ -38,6 +40,7 @@ export default function EntryDetailPage() {
 
       try {
         const entry = await getEntryById(id);
+
         setTitle(entry.title || "Untitled Entry");
         setMood(entry.mood || "📝");
         setContent(entry.content || "");
@@ -49,8 +52,7 @@ export default function EntryDetailPage() {
           })
         );
       } catch (error: any) {
-        alert(error.message || "Failed to load entry.");
-        router.push("/dashboard");
+        setErrorMessage(error.message || "Failed to load entry.");
       } finally {
         setLoading(false);
       }
@@ -58,6 +60,9 @@ export default function EntryDetailPage() {
 
     if (id) {
       loadEntry();
+    } else {
+      setLoading(false);
+      setErrorMessage("Invalid entry ID.");
     }
   }, [id, router]);
 
@@ -70,29 +75,41 @@ export default function EntryDetailPage() {
       await signOutUser();
       router.push("/login");
     } catch (error: any) {
-      alert(error.message || "Logout failed.");
+      setErrorMessage(error.message || "Logout failed.");
     }
   }
 
- async function handleDelete() {
-  try {
-    await deleteEntry(id);
-    router.push("/dashboard");
-  } catch (error: any) {
-    console.error(error);
+  async function handleDelete() {
+    if (!id || deleting) return;
+
+    setDeleting(true);
+    setErrorMessage("");
+
+    try {
+      await deleteEntry(id);
+      router.push("/dashboard");
+    } catch (error: any) {
+      setErrorMessage(error.message || "Failed to delete entry.");
+      setDeleting(false);
+    }
   }
-}
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-2xl font-bold" style={{ backgroundColor: COLORS.bg, color: COLORS.text }}>
+      <div
+        className="min-h-screen flex items-center justify-center text-2xl font-bold"
+        style={{ backgroundColor: COLORS.bg, color: COLORS.text }}
+      >
         Loading...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen md:h-screen flex flex-col overflow-hidden" style={{ backgroundColor: COLORS.bg }}>
+    <div
+      className="min-h-screen md:h-screen flex flex-col overflow-hidden"
+      style={{ backgroundColor: COLORS.bg }}
+    >
       <header className="w-full flex-shrink-0" style={{ backgroundColor: COLORS.top }}>
         <div className="w-full px-4 sm:px-6 md:px-10 py-4 flex items-center justify-end">
           <button
@@ -121,18 +138,30 @@ export default function EntryDetailPage() {
 
               <div className="min-w-0">
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold truncate" style={{ color: COLORS.text }}>
+                  <h1
+                    className="text-4xl sm:text-5xl md:text-6xl font-extrabold truncate"
+                    style={{ color: COLORS.text }}
+                  >
                     {title}
                   </h1>
                   <span className="text-4xl sm:text-5xl">{mood}</span>
                 </div>
 
-                <div className="mt-2 text-xl sm:text-2xl md:text-3xl" style={{ color: "rgba(79,37,42,0.55)" }}>
+                <div
+                  className="mt-2 text-xl sm:text-2xl md:text-3xl"
+                  style={{ color: "rgba(79,37,42,0.55)" }}
+                >
                   {date}
                 </div>
               </div>
             </div>
           </div>
+
+          {errorMessage && (
+            <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+              {errorMessage}
+            </div>
+          )}
 
           <div className="mt-6 flex-1 flex gap-6 lg:gap-10 items-start overflow-hidden flex-col lg:flex-row">
             <div
@@ -143,7 +172,10 @@ export default function EntryDetailPage() {
                 boxShadow: "0 18px 35px rgba(79,37,42,0.18)",
               }}
             >
-              <p className="text-xl sm:text-2xl md:text-3xl leading-relaxed whitespace-pre-wrap" style={{ color: COLORS.text }}>
+              <p
+                className="text-xl sm:text-2xl md:text-3xl leading-relaxed whitespace-pre-wrap"
+                style={{ color: COLORS.text }}
+              >
                 {content}
               </p>
             </div>
@@ -172,14 +204,15 @@ export default function EntryDetailPage() {
 
             <button
               onClick={handleDelete}
-              className="px-10 sm:px-16 py-4 sm:py-5 rounded-xl text-xl sm:text-3xl font-bold border transition"
+              disabled={deleting}
+              className="px-10 sm:px-16 py-4 sm:py-5 rounded-xl text-xl sm:text-3xl font-bold border transition disabled:opacity-60"
               style={{
                 backgroundColor: "rgba(255,255,255,0.55)",
                 borderColor: COLORS.border,
                 color: "#cc1f1f",
               }}
             >
-              Delete
+              {deleting ? "Deleting..." : "Delete"}
             </button>
           </div>
         </div>
