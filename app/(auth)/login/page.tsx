@@ -10,9 +10,7 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  // eye toggle state
   const [showPassword, setShowPassword] = useState(false);
-
   const [loading, setLoading] = useState(false);
 
   async function onSubmit(e: React.FormEvent) {
@@ -63,7 +61,6 @@ export default function LoginPage() {
       </header>
 
       <main className="relative z-10 flex-1 flex overflow-hidden">
-        {/* Sidebar: hidden on small screens */}
         <aside className="hidden md:flex relative z-10 w-[420px] bg-[#fbe3b9] border-r border-[#e6c9a4] px-8 py-8 flex-col overflow-hidden">
           <div className="flex flex-col items-start">
             <img
@@ -205,7 +202,6 @@ export default function LoginPage() {
                 </form>
               </div>
 
-              {/* Mobile-only Book-flower so it still appears */}
               <div className="md:hidden mt-8 flex justify-center">
                 <img
                   src="/images/Book-flower.png"

@@ -1,20 +1,14 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-
-type Draft = {
-  id: string;
-  title: string;
-  date: string;
-  mood: string;
-  content: string;
-};
+import { getCurrentUser, signOutUser } from "@/lib/auth";
+import { deleteDraft, getDraftById, publishDraft, updateDraft } from "@/lib/journal";
 
 export default function DraftDetailPage() {
   const router = useRouter();
   const params = useParams();
-  const id = String(params?.id || "1");
+  const id = String(params?.id || "");
 
   const COLORS = {
     bg: "#edd0ac",
@@ -27,20 +21,46 @@ export default function DraftDetailPage() {
     softWhite: "rgba(255,255,255,0.55)",
   };
 
-  const drafts: Draft[] = useMemo(
-    () => [
-      { id: "1", title: "Draft: Study plan", date: "February 19, 2026", mood: "✨", content: "Start writing your draft..." },
-      { id: "2", title: "Draft: My feelings", date: "February 19, 2026", mood: "💭", content: "I feel a bit tired but..." },
-      { id: "3", title: "Draft: Goals", date: "February 19, 2026", mood: "🎯", content: "This month I want to improve..." },
-    ],
-    []
-  );
+  const [title, setTitle] = useState("Draft");
+  const [content, setContent] = useState("");
+  const [mood, setMood] = useState("📝");
+  const [createdAt, setCreatedAt] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
-  const isNew = id === "new";
-  const current = drafts.find((d) => d.id === id) || drafts[0];
+  useEffect(() => {
+    const loadDraft = async () => {
+      const user = await getCurrentUser();
 
-  const [title] = useState<string>(isNew ? "Draft: New idea" : current.title);
-  const [content, setContent] = useState<string>(isNew ? "" : current.content);
+      if (!user) {
+        router.replace("/login");
+        return;
+      }
+
+      try {
+        const draft = await getDraftById(id);
+        setTitle(draft.title || "Draft");
+        setContent(draft.content || "");
+        setMood(draft.mood || "📝");
+        setCreatedAt(
+          new Date(draft.created_at).toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "long",
+            day: "numeric",
+          })
+        );
+      } catch (error: any) {
+        alert(error.message || "Failed to load draft.");
+        router.push("/drafts");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (id) {
+      loadDraft();
+    }
+  }, [id, router]);
 
   const hoverPrimary = (e: React.MouseEvent<HTMLButtonElement>, on: boolean) => {
     e.currentTarget.style.backgroundColor = on
@@ -48,19 +68,81 @@ export default function DraftDetailPage() {
       : COLORS.primary;
   };
 
-  const saveUIOnly = () => alert("Saved (UI only). Backend later with Supabase ✅");
-  const saveAsDraftUIOnly = () => alert("Saved as Draft (UI only). Backend later with Supabase ✅");
-  const deleteUIOnly = () => {
-    alert("Deleted (UI only). Backend later with Supabase ✅");
-    router.push("/drafts");
-  };
+  async function handleLogout() {
+    try {
+      await signOutUser();
+      router.push("/login");
+    } catch (error: any) {
+      alert(error.message || "Logout failed.");
+    }
+  }
+
+  async function handleSaveAsDraft() {
+    setSaving(true);
+
+    try {
+      await updateDraft(id, {
+        title,
+        content,
+        mood,
+      });
+
+      alert("Draft saved successfully.");
+      router.push("/drafts");
+    } catch (error: any) {
+      alert(error.message || "Failed to save draft.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handlePublish() {
+    setSaving(true);
+
+    try {
+      await updateDraft(id, {
+        title,
+        content,
+        mood,
+      });
+
+      const entry = await publishDraft(id);
+      alert("Draft published successfully.");
+      router.push(`/entry/${entry.id}`);
+    } catch (error: any) {
+      alert(error.message || "Failed to publish draft.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleDelete() {
+    const confirmed = window.confirm("Delete this draft?");
+    if (!confirmed) return;
+
+    try {
+      await deleteDraft(id);
+      alert("Draft deleted.");
+      router.push("/drafts");
+    } catch (error: any) {
+      alert(error.message || "Failed to delete draft.");
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-2xl font-bold" style={{ backgroundColor: COLORS.bg, color: COLORS.text }}>
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen md:h-screen flex flex-col overflow-hidden" style={{ backgroundColor: COLORS.bg }}>
       <header className="w-full shrink-0" style={{ backgroundColor: COLORS.top }}>
         <div className="w-full px-4 sm:px-6 md:px-10 py-4 flex items-center justify-end">
           <button
-            onClick={() => alert("Logout (UI only)")}
+            onClick={handleLogout}
             className="text-white font-bold px-5 py-2 rounded-lg transition"
             style={{ backgroundColor: COLORS.primary }}
             onMouseEnter={(e) => hoverPrimary(e, true)}
@@ -83,16 +165,19 @@ export default function DraftDetailPage() {
                 ←
               </button>
 
-              <div className="min-w-0">
+              <div className="min-w-0 w-full">
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold truncate" style={{ color: COLORS.text }}>
-                    {title}
-                  </h1>
-                  <span className="text-4xl sm:text-5xl">{isNew ? "✨" : current.mood}</span>
+                  <input
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="text-4xl sm:text-5xl md:text-6xl font-extrabold truncate bg-transparent outline-none w-full"
+                    style={{ color: COLORS.text }}
+                  />
+                  <span className="text-4xl sm:text-5xl">{mood}</span>
                 </div>
 
                 <div className="mt-2 sm:mt-3 text-xl sm:text-2xl md:text-3xl" style={{ color: "rgba(79,37,42,0.55)" }}>
-                  {isNew ? "February 19, 2026" : current.date}
+                  {createdAt}
                 </div>
               </div>
             </div>
@@ -120,18 +205,20 @@ export default function DraftDetailPage() {
 
               <div className="mt-5 sm:mt-7 flex items-center gap-3 sm:gap-6 flex-wrap">
                 <button
-                  onClick={saveUIOnly}
-                  className="px-10 sm:px-12 py-3 sm:py-4 rounded-xl text-base sm:text-xl font-bold text-white transition shadow-md"
+                  onClick={handlePublish}
+                  disabled={saving}
+                  className="px-10 sm:px-12 py-3 sm:py-4 rounded-xl text-base sm:text-xl font-bold text-white transition shadow-md disabled:opacity-60"
                   style={{ backgroundColor: COLORS.primary }}
                   onMouseEnter={(e) => hoverPrimary(e, true)}
                   onMouseLeave={(e) => hoverPrimary(e, false)}
                 >
-                  Save
+                  {saving ? "Saving..." : "Save"}
                 </button>
 
                 <button
-                  onClick={saveAsDraftUIOnly}
-                  className="px-10 sm:px-12 py-3 sm:py-4 rounded-xl text-base sm:text-xl font-bold border transition shadow-sm"
+                  onClick={handleSaveAsDraft}
+                  disabled={saving}
+                  className="px-10 sm:px-12 py-3 sm:py-4 rounded-xl text-base sm:text-xl font-bold border transition shadow-sm disabled:opacity-60"
                   style={{
                     backgroundColor: COLORS.softWhite,
                     borderColor: COLORS.border,
@@ -142,7 +229,7 @@ export default function DraftDetailPage() {
                 </button>
 
                 <button
-                  onClick={deleteUIOnly}
+                  onClick={handleDelete}
                   className="px-10 sm:px-12 py-3 sm:py-4 rounded-xl text-base sm:text-xl font-bold border transition shadow-sm"
                   style={{
                     backgroundColor: COLORS.softWhite,
@@ -155,7 +242,6 @@ export default function DraftDetailPage() {
               </div>
             </div>
 
-            {/* Coffee image: hide on small to avoid weird layout */}
             <div className="hidden lg:block w-[420px] relative">
               <img
                 src="/images/coffee.png"

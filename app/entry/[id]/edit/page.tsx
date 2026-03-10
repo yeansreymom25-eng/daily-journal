@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
-import type { User } from "@supabase/supabase-js";
-import { createDraft, createEntry } from "@/lib/journal";
+import { useParams, useRouter } from "next/navigation";
 import { getCurrentUser, signOutUser } from "@/lib/auth";
+import { getEntryById, updateEntry } from "@/lib/journal";
 
-export default function NewEntryPage() {
+export default function EditEntryPage() {
   const router = useRouter();
+  const params = useParams();
+  const id = String(params?.id || "");
 
   const COLORS = {
     bg: "#edd0ac",
@@ -17,11 +18,10 @@ export default function NewEntryPage() {
     cardBorder: "rgba(79,37,42,0.25)",
   };
 
-  const [user, setUser] = useState<User | null>(null);
-  const [authLoading, setAuthLoading] = useState(true);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [selectedEmoji, setSelectedEmoji] = useState<string>("");
+  const [selectedEmoji, setSelectedEmoji] = useState("");
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   const emojis = useMemo(
@@ -35,20 +35,31 @@ export default function NewEntryPage() {
   );
 
   useEffect(() => {
-    const loadUser = async () => {
-      const currentUser = await getCurrentUser();
+    const loadEntry = async () => {
+      const user = await getCurrentUser();
 
-      if (!currentUser) {
+      if (!user) {
         router.replace("/login");
         return;
       }
 
-      setUser(currentUser);
-      setAuthLoading(false);
+      try {
+        const entry = await getEntryById(id);
+        setTitle(entry.title);
+        setContent(entry.content);
+        setSelectedEmoji(entry.mood || "");
+      } catch (error: any) {
+        alert(error.message || "Failed to load entry.");
+        router.push("/dashboard");
+      } finally {
+        setLoading(false);
+      }
     };
 
-    loadUser();
-  }, [router]);
+    if (id) {
+      loadEntry();
+    }
+  }, [id, router]);
 
   async function handleLogout() {
     try {
@@ -60,50 +71,25 @@ export default function NewEntryPage() {
   }
 
   async function onSave() {
-    if (!user) return;
-
     setSaving(true);
 
     try {
-      const entry = await createEntry({
-        user_id: user.id,
+      await updateEntry(id, {
         title,
         content,
         mood: selectedEmoji,
       });
 
-      alert("Entry saved successfully.");
-      router.push(`/entry/${entry.id}`);
+      alert("Entry updated successfully.");
+      router.push(`/entry/${id}`);
     } catch (error: any) {
-      alert(error.message || "Failed to save entry.");
+      alert(error.message || "Failed to update entry.");
     } finally {
       setSaving(false);
     }
   }
 
-  async function onSaveDraft() {
-    if (!user) return;
-
-    setSaving(true);
-
-    try {
-      const draft = await createDraft({
-        user_id: user.id,
-        title,
-        content,
-        mood: selectedEmoji,
-      });
-
-      alert("Draft saved successfully.");
-      router.push(`/drafts/${draft.id}`);
-    } catch (error: any) {
-      alert(error.message || "Failed to save draft.");
-    } finally {
-      setSaving(false);
-    }
-  }
-
-  if (authLoading) {
+  if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center text-2xl font-bold" style={{ background: COLORS.bg, color: COLORS.text }}>
         Loading...
@@ -134,7 +120,7 @@ export default function NewEntryPage() {
       <main className="flex-1 flex justify-center items-start px-6 py-4 relative overflow-hidden">
         <div className="w-full max-w-[1100px] relative h-full flex flex-col">
           <button
-            onClick={() => router.back()}
+            onClick={() => router.push(`/entry/${id}`)}
             className="text-2xl font-extrabold mb-3 flex items-center gap-2 flex-shrink-0"
             style={{ color: COLORS.text }}
           >
@@ -214,18 +200,6 @@ export default function NewEntryPage() {
               }}
             >
               {saving ? "Saving..." : "Save"}
-            </button>
-
-            <button
-              onClick={onSaveDraft}
-              disabled={saving}
-              className="px-14 py-4 rounded-2xl font-extrabold text-lg transition shadow-md disabled:opacity-60"
-              style={{
-                background: "#d9d9d9",
-                color: "#111",
-              }}
-            >
-              Save as Draft
             </button>
           </div>
         </div>

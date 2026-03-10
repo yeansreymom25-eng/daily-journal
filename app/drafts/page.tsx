@@ -1,35 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-
-type Draft = {
-  id: string;
-  title: string;
-  preview: string;
-  date: string;
-  mood: string;
-};
-
-const STORAGE_KEY = "myjournal_drafts_v1";
-
-function readDraftsFromStorage(): Draft[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    if (!Array.isArray(parsed)) return [];
-    return parsed;
-  } catch {
-    return [];
-  }
-}
-
-function writeDraftsToStorage(drafts: Draft[]) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(drafts));
-}
+import type { User } from "@supabase/supabase-js";
+import { getCurrentUser, signOutUser } from "@/lib/auth";
+import { createDraft, deleteDraft, getDrafts, type JournalDraft } from "@/lib/journal";
 
 export default function DraftsPage() {
   const router = useRouter();
@@ -45,39 +20,33 @@ export default function DraftsPage() {
     card: "rgba(255,255,255,0.65)",
   };
 
-  const seedDrafts: Draft[] = useMemo(
-    () => [
-      {
-        id: "d1",
-        title: "Draft: Study plan ✍️",
-        preview: "Today I want to plan my week...",
-        date: "February 20, 2026",
-        mood: "📝",
-      },
-      {
-        id: "d2",
-        title: "Draft: My feelings ☁️",
-        preview: "I feel a bit tired but...",
-        date: "February 20, 2026",
-        mood: "💭",
-      },
-      {
-        id: "d3",
-        title: "Draft: Goals 🎯",
-        preview: "This month I want to improve...",
-        date: "February 20, 2026",
-        mood: "🔥",
-      },
-    ],
-    []
-  );
-
-  const [drafts, setDrafts] = useState<Draft[]>(seedDrafts);
+  const [user, setUser] = useState<User | null>(null);
+  const [drafts, setDrafts] = useState<JournalDraft[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const stored = readDraftsFromStorage();
-    setDrafts(stored.length > 0 ? stored : seedDrafts);
-  }, [seedDrafts]);
+    const loadData = async () => {
+      const currentUser = await getCurrentUser();
+
+      if (!currentUser) {
+        router.replace("/login");
+        return;
+      }
+
+      setUser(currentUser);
+
+      try {
+        const data = await getDrafts();
+        setDrafts(data);
+      } catch (error: any) {
+        alert(error.message || "Failed to load drafts.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [router]);
 
   const hoverPrimary = (e: React.MouseEvent<HTMLButtonElement>, on: boolean) => {
     e.currentTarget.style.backgroundColor = on
@@ -85,32 +54,54 @@ export default function DraftsPage() {
       : COLORS.primary;
   };
 
-  const createNewDraft = () => {
-    const newId = `d_${Date.now()}`;
-    const newDraft: Draft = {
-      id: newId,
-      title: "Draft: New idea ✨",
-      preview: "Start writing your draft...",
-      date: new Date().toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric",
-      }),
-      mood: "📝",
-    };
+  const createNewDraft = async () => {
+    if (!user) return;
 
-    const existing = readDraftsFromStorage();
-    const merged =
-      existing.length > 0 ? [newDraft, ...existing] : [newDraft, ...seedDrafts];
+    try {
+      const newDraft = await createDraft({
+        user_id: user.id,
+        title: "Draft: New idea ✨",
+        content: "",
+        mood: "📝",
+      });
 
-    writeDraftsToStorage(merged);
-    setDrafts(merged);
-    router.push(`/drafts/${newId}`);
+      router.push(`/drafts/${newDraft.id}`);
+    } catch (error: any) {
+      alert(error.message || "Failed to create draft.");
+    }
   };
+
+  const handleDeleteDraft = async (id: string) => {
+    const confirmed = window.confirm("Delete this draft?");
+    if (!confirmed) return;
+
+    try {
+      await deleteDraft(id);
+      setDrafts((prev) => prev.filter((draft) => draft.id !== id));
+    } catch (error: any) {
+      alert(error.message || "Failed to delete draft.");
+    }
+  };
+
+  async function handleLogout() {
+    try {
+      await signOutUser();
+      router.push("/login");
+    } catch (error: any) {
+      alert(error.message || "Logout failed.");
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-2xl font-bold" style={{ backgroundColor: COLORS.bg, color: COLORS.text }}>
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: COLORS.bg }}>
-      {/* TOP BAR */}
       <header
         className="w-full border-b shadow-md"
         style={{ backgroundColor: COLORS.top, borderColor: "#3a1b1f" }}
@@ -127,7 +118,7 @@ export default function DraftsPage() {
           </button>
 
           <button
-            onClick={() => alert("Logout (UI only)")}
+            onClick={handleLogout}
             className="text-white font-bold px-4 sm:px-5 py-2 rounded-lg transition text-sm sm:text-base"
             style={{ backgroundColor: COLORS.primary }}
             onMouseEnter={(e) => hoverPrimary(e, true)}
@@ -139,18 +130,21 @@ export default function DraftsPage() {
           <button
             className="h-9 w-9 rounded-md flex items-center justify-center text-white"
             style={{ backgroundColor: COLORS.primary }}
-            onMouseEnter={(e) => hoverPrimary(e as any, true)}
-            onMouseLeave={(e) => hoverPrimary(e as any, false)}
-            title="Profile (UI)"
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = COLORS.primaryHover;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = COLORS.primary;
+            }}
+            onClick={() => router.push("/settings")}
+            title={user?.email ?? "Profile"}
           >
             👤
           </button>
         </div>
       </header>
 
-      {/* BODY */}
       <main className="flex-1 flex">
-        {/* SIDEBAR (responsive width) */}
         <aside
           className="hidden md:flex w-[300px] lg:w-[340px] border-r flex-col"
           style={{
@@ -173,12 +167,12 @@ export default function DraftsPage() {
               onClick={() => router.push("/dashboard")}
               className="w-full flex items-center gap-4 px-5 py-4 rounded-lg font-bold transition"
               style={{ color: COLORS.text }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor = "rgba(237,208,172,0.4)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.backgroundColor = "transparent")
-              }
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "rgba(237,208,172,0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+              }}
             >
               <img src="/images/dashboard.png" alt="Dashboard" className="w-7" />
               Dashboard
@@ -196,19 +190,18 @@ export default function DraftsPage() {
               onClick={() => router.push("/settings")}
               className="w-full flex items-center gap-4 px-5 py-4 rounded-lg font-bold transition"
               style={{ color: COLORS.text }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor = "rgba(237,208,172,0.4)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.backgroundColor = "transparent")
-              }
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "rgba(237,208,172,0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+              }}
             >
               ⚙️ Setting
             </button>
           </div>
         </aside>
 
-        {/* CONTENT */}
         <section className="flex-1 p-4 sm:p-6 md:p-10">
           <div className="flex items-center justify-between gap-3">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold" style={{ color: COLORS.text }}>
@@ -234,33 +227,55 @@ export default function DraftsPage() {
               boxShadow: "0 18px 35px rgba(79,37,42,0.18)",
             }}
           >
-            {drafts.map((d) => (
-              <div
-                key={d.id}
-                onClick={() => router.push(`/drafts/${d.id}`)}
-                className="cursor-pointer px-4 sm:px-6 md:px-8 py-5 sm:py-6 border-b flex items-center justify-between transition"
-                style={{ borderColor: "rgba(79,37,42,0.10)" }}
-                onMouseEnter={(ev) =>
-                  (ev.currentTarget.style.backgroundColor = "rgba(251,243,185,0.40)")
-                }
-                onMouseLeave={(ev) =>
-                  (ev.currentTarget.style.backgroundColor = "transparent")
-                }
-              >
-                <div className="min-w-0">
-                  <div className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#1b1b1b] truncate">
-                    {d.title} <span className="text-lg sm:text-xl md:text-2xl">{d.mood}</span>
-                  </div>
-                  <div className="text-gray-600 text-sm sm:text-base md:text-lg mt-1 truncate">
-                    {d.preview}
-                  </div>
-                </div>
-
-                <div className="flex gap-4 sm:gap-5 text-xl sm:text-2xl opacity-80 flex-shrink-0">
-                  ✏️ 🗑️
-                </div>
+            {drafts.length === 0 ? (
+              <div className="px-6 py-10 text-xl" style={{ color: COLORS.text }}>
+                No drafts yet.
               </div>
-            ))}
+            ) : (
+              drafts.map((d) => (
+                <div
+                  key={d.id}
+                  onClick={() => router.push(`/drafts/${d.id}`)}
+                  className="cursor-pointer px-4 sm:px-6 md:px-8 py-5 sm:py-6 border-b flex items-center justify-between transition"
+                  style={{ borderColor: "rgba(79,37,42,0.10)" }}
+                  onMouseEnter={(ev) => {
+                    ev.currentTarget.style.backgroundColor = "rgba(251,243,185,0.40)";
+                  }}
+                  onMouseLeave={(ev) => {
+                    ev.currentTarget.style.backgroundColor = "transparent";
+                  }}
+                >
+                  <div className="min-w-0">
+                    <div className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#1b1b1b] truncate">
+                      {d.title || "Untitled Draft"}{" "}
+                      <span className="text-lg sm:text-xl md:text-2xl">{d.mood}</span>
+                    </div>
+                    <div className="text-gray-600 text-sm sm:text-base md:text-lg mt-1 truncate">
+                      {d.content ? d.content.slice(0, 90) : "Start writing your draft..."}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-4 sm:gap-5 text-xl sm:text-2xl opacity-80 flex-shrink-0">
+                    <button
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        router.push(`/drafts/${d.id}`);
+                      }}
+                    >
+                      ✏️
+                    </button>
+                    <button
+                      onClick={(ev) => {
+                        ev.stopPropagation();
+                        handleDeleteDraft(d.id);
+                      }}
+                    >
+                      🗑️
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </section>
       </main>

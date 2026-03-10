@@ -15,10 +15,10 @@ export default function ForgotPasswordPage() {
     setLoading(true);
 
     const siteUrl =
-      process.env.NEXT_PUBLIC_SITE_URL || "https://daily-journal-mvks.vercel.app";
+      process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${siteUrl}/login`,
+      redirectTo: `${siteUrl}/reset-password`,
     });
 
     setLoading(false);
@@ -60,7 +60,6 @@ export default function ForgotPasswordPage() {
       </header>
 
       <main className="relative z-10 flex flex-1 overflow-hidden">
-        {/* Sidebar hidden on small */}
         <aside className="hidden md:flex relative z-10 w-[420px] bg-[#fbe3b9] border-r border-[#e6c9a4] px-8 py-8 flex-col overflow-hidden">
           <div className="flex flex-col items-start">
             <img
@@ -149,7 +148,6 @@ export default function ForgotPasswordPage() {
                 </form>
               </div>
 
-              {/* Mobile-only Book-flower */}
               <div className="md:hidden mt-8 flex justify-center">
                 <img
                   src="/images/Book-flower.png"

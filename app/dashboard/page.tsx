@@ -1,19 +1,20 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import type { User } from "@supabase/supabase-js";
+import { getCurrentUser, signOutUser } from "@/lib/auth";
+import { getDrafts, getEntries, type JournalDraft, type JournalEntry } from "@/lib/journal";
 
 type Tab = "recent" | "drafts";
-
-type Entry = {
-  id: string;
-  title: string;
-  preview: string;
-};
 
 export default function DashboardPage() {
   const router = useRouter();
   const [tab, setTab] = useState<Tab>("recent");
+  const [user, setUser] = useState<User | null>(null);
+  const [entries, setEntries] = useState<JournalEntry[]>([]);
+  const [drafts, setDrafts] = useState<JournalDraft[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const COLORS = {
     bg: "#edd0ac",
@@ -24,22 +25,89 @@ export default function DashboardPage() {
     text: "#4f252a",
   };
 
-  const entries: Entry[] = useMemo(
-    () => [
-      { id: "1", title: "A Good Day 🫶", preview: "Today was a great day, I went to..." },
-      { id: "2", title: "Study Progress 🥹", preview: "Today I studied and I feel..." },
-      { id: "3", title: "My Bad Day 🥲", preview: "It was not easy today because..." },
-    ],
-    []
-  );
+  useEffect(() => {
+    const loadData = async () => {
+      const currentUser = await getCurrentUser();
+
+      if (!currentUser) {
+        router.replace("/login");
+        return;
+      }
+
+      setUser(currentUser);
+
+      try {
+        const [entriesData, draftsData] = await Promise.all([
+          getEntries(),
+          getDrafts(),
+        ]);
+
+        setEntries(entriesData);
+        setDrafts(draftsData);
+      } catch (error: any) {
+        alert(error.message || "Failed to load dashboard.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [router]);
+
+  const currentList = useMemo(() => {
+    if (tab === "recent") return entries;
+    return drafts;
+  }, [tab, entries, drafts]);
 
   const hoverPrimary = (e: React.MouseEvent<HTMLButtonElement>, on: boolean) => {
     e.currentTarget.style.backgroundColor = on ? COLORS.primaryHover : COLORS.primary;
   };
 
+  async function handleLogout() {
+    try {
+      await signOutUser();
+      router.push("/login");
+    } catch (error: any) {
+      alert(error.message || "Logout failed.");
+    }
+  }
+
+  async function handleDeleteEntry(id: string) {
+    const confirmed = window.confirm("Delete this journal entry?");
+    if (!confirmed) return;
+
+    try {
+      const { deleteEntry } = await import("@/lib/journal");
+      await deleteEntry(id);
+      setEntries((prev) => prev.filter((item) => item.id !== id));
+    } catch (error: any) {
+      alert(error.message || "Failed to delete entry.");
+    }
+  }
+
+  async function handleDeleteDraft(id: string) {
+    const confirmed = window.confirm("Delete this draft?");
+    if (!confirmed) return;
+
+    try {
+      const { deleteDraft } = await import("@/lib/journal");
+      await deleteDraft(id);
+      setDrafts((prev) => prev.filter((item) => item.id !== id));
+    } catch (error: any) {
+      alert(error.message || "Failed to delete draft.");
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center text-2xl font-bold" style={{ backgroundColor: COLORS.bg, color: COLORS.text }}>
+        Loading...
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: COLORS.bg }}>
-      {/* TOP BAR */}
       <header
         className="w-full border-b shadow-md"
         style={{ backgroundColor: COLORS.top, borderColor: "#3a1b1f" }}
@@ -56,7 +124,7 @@ export default function DashboardPage() {
           </button>
 
           <button
-            onClick={() => alert("Logout (UI only)")}
+            onClick={handleLogout}
             className="text-white font-bold px-5 py-2 rounded-lg transition"
             style={{ backgroundColor: COLORS.primary }}
             onMouseEnter={(e) => hoverPrimary(e, true)}
@@ -68,22 +136,21 @@ export default function DashboardPage() {
           <button
             className="h-9 w-9 rounded-md flex items-center justify-center text-white"
             style={{ backgroundColor: COLORS.primary }}
-            onMouseEnter={(e) =>
-              (e.currentTarget.style.backgroundColor = COLORS.primaryHover)
-            }
-            onMouseLeave={(e) =>
-              (e.currentTarget.style.backgroundColor = COLORS.primary)
-            }
-            onClick={() => alert("Profile (UI only)")}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = COLORS.primaryHover;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = COLORS.primary;
+            }}
+            onClick={() => router.push("/settings")}
+            title={user?.email ?? "Profile"}
           >
             👤
           </button>
         </div>
       </header>
 
-      {/* BODY */}
       <main className="flex-1 flex">
-        {/* SIDEBAR */}
         <aside
           className="w-[340px] border-r flex flex-col"
           style={{ backgroundColor: COLORS.side, borderColor: "rgba(79,37,42,0.3)" }}
@@ -111,10 +178,12 @@ export default function DashboardPage() {
             <button
               className="w-full flex items-center gap-4 px-5 py-4 rounded-lg font-bold transition"
               style={{ color: COLORS.text }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor = "rgba(237,208,172,0.4)")
-              }
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "rgba(237,208,172,0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+              }}
               onClick={() => router.push("/drafts")}
             >
               <img src="/images/drafts.png" alt="Drafts" className="w-7" />
@@ -125,17 +194,18 @@ export default function DashboardPage() {
               onClick={() => router.push("/settings")}
               className="w-full flex items-center gap-4 px-5 py-4 rounded-lg font-bold transition"
               style={{ color: COLORS.text }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.backgroundColor = "rgba(237,208,172,0.4)")
-              }
-              onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = "rgba(237,208,172,0.4)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = "transparent";
+              }}
             >
               ⚙️ Setting
             </button>
           </div>
         </aside>
 
-        {/* CONTENT */}
         <section className="flex-1 p-10">
           <div className="flex items-center justify-between">
             <h1 className="text-6xl font-extrabold" style={{ color: COLORS.text }}>
@@ -165,7 +235,7 @@ export default function DashboardPage() {
                   color: tab === "drafts" ? "white" : COLORS.text,
                 }}
               >
-                Drafts 2
+                Drafts {drafts.length}
               </button>
             </div>
           </div>
@@ -174,45 +244,84 @@ export default function DashboardPage() {
             className="mt-8 bg-white rounded-xl border overflow-hidden"
             style={{ borderColor: "rgba(79,37,42,0.25)" }}
           >
-            {entries.map((e) => (
-              <div
-                key={e.id}
-                onClick={() => router.push(`/entry/${e.id}`)}
-                className="px-8 py-6 border-b flex items-center justify-between transition cursor-pointer"
-                style={{ borderColor: "rgba(79,37,42,0.10)" }}
-                onMouseEnter={(ev) =>
-                  (ev.currentTarget.style.backgroundColor = "rgba(251,243,185,0.40)")
-                }
-                onMouseLeave={(ev) => (ev.currentTarget.style.backgroundColor = "transparent")}
-              >
-                <div>
-                  <div className="text-3xl font-extrabold text-[#1b1b1b]">{e.title}</div>
-                  <div className="text-gray-500 text-lg mt-1">{e.preview}</div>
-                </div>
-
-                {/* Buttons MUST stop propagation so row click still works */}
-                <div className="flex gap-5 text-2xl">
-                  <button
-                    onClick={(ev) => {
-                      ev.stopPropagation();
-                      alert("Edit (UI only)");
-                    }}
-                    title="Edit"
-                  >
-                    ✏️
-                  </button>
-                  <button
-                    onClick={(ev) => {
-                      ev.stopPropagation();
-                      alert("Delete (UI only)");
-                    }}
-                    title="Delete"
-                  >
-                    🗑️
-                  </button>
-                </div>
+            {currentList.length === 0 ? (
+              <div className="px-8 py-10 text-xl" style={{ color: COLORS.text }}>
+                {tab === "recent" ? "No journal entries yet." : "No drafts yet."}
               </div>
-            ))}
+            ) : (
+              currentList.map((item) => (
+                <div
+                  key={item.id}
+                  onClick={() =>
+                    router.push(tab === "recent" ? `/entry/${item.id}` : `/drafts/${item.id}`)
+                  }
+                  className="px-8 py-6 border-b flex items-center justify-between transition cursor-pointer"
+                  style={{ borderColor: "rgba(79,37,42,0.10)" }}
+                  onMouseEnter={(ev) => {
+                    ev.currentTarget.style.backgroundColor = "rgba(251,243,185,0.40)";
+                  }}
+                  onMouseLeave={(ev) => {
+                    ev.currentTarget.style.backgroundColor = "transparent";
+                  }}
+                >
+                  <div>
+                    <div className="text-3xl font-extrabold text-[#1b1b1b]">
+                      {item.title || (tab === "recent" ? "Untitled Entry" : "Untitled Draft")}{" "}
+                      {item.mood}
+                    </div>
+                    <div className="text-gray-500 text-lg mt-1">
+                      {item.content ? `${item.content.slice(0, 80)}...` : "No content yet."}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-5 text-2xl">
+                    {tab === "recent" ? (
+                      <>
+                        <button
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            router.push(`/entry/${item.id}/edit`);
+                          }}
+                          title="Edit"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            handleDeleteEntry(item.id);
+                          }}
+                          title="Delete"
+                        >
+                          🗑️
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            router.push(`/drafts/${item.id}`);
+                          }}
+                          title="Edit Draft"
+                        >
+                          ✏️
+                        </button>
+                        <button
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            handleDeleteDraft(item.id);
+                          }}
+                          title="Delete Draft"
+                        >
+                          🗑️
+                        </button>
+                      </>
+                    )}
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </section>
       </main>
