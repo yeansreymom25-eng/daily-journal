@@ -71,17 +71,14 @@ export default function DraftsPage() {
     }
   };
 
-  const handleDeleteDraft = async (id: string) => {
-    const confirmed = window.confirm("Delete this draft?");
-    if (!confirmed) return;
-
-    try {
-      await deleteDraft(id);
-      setDrafts((prev) => prev.filter((draft) => draft.id !== id));
-    } catch (error: any) {
-      alert(error.message || "Failed to delete draft.");
-    }
-  };
+const handleDeleteDraft = async (id: string) => {
+  try {
+    await deleteDraft(id);
+    setDrafts((prev) => prev.filter((draft) => draft.id !== id));
+  } catch (error: any) {
+    console.error(error);
+  }
+};
 
   async function handleLogout() {
     try {

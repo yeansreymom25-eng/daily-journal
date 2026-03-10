@@ -86,17 +86,14 @@ export default function DashboardPage() {
   }
 
   async function handleDeleteDraft(id: string) {
-    const confirmed = window.confirm("Delete this draft?");
-    if (!confirmed) return;
-
-    try {
-      const { deleteDraft } = await import("@/lib/journal");
-      await deleteDraft(id);
-      setDrafts((prev) => prev.filter((item) => item.id !== id));
-    } catch (error: any) {
-      alert(error.message || "Failed to delete draft.");
-    }
+  try {
+    const { deleteDraft } = await import("@/lib/journal");
+    await deleteDraft(id);
+    setDrafts((prev) => prev.filter((item) => item.id !== id));
+  } catch (error: any) {
+    console.error(error);
   }
+}
 
   if (loading) {
     return (
