@@ -23,6 +23,7 @@ export default function EditEntryPage() {
   const [selectedEmoji, setSelectedEmoji] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const emojis = useMemo(
     () => [
@@ -49,7 +50,7 @@ export default function EditEntryPage() {
         setContent(entry.content);
         setSelectedEmoji(entry.mood || "");
       } catch (error: any) {
-        alert(error.message || "Failed to load entry.");
+        setErrorMessage(error.message || "Failed to load entry.");
         router.push("/dashboard");
       } finally {
         setLoading(false);
@@ -66,24 +67,26 @@ export default function EditEntryPage() {
       await signOutUser();
       router.push("/login");
     } catch (error: any) {
-      alert(error.message || "Logout failed.");
+      setErrorMessage(error.message || "Logout failed.");
     }
   }
 
   async function onSave() {
+    if (saving) return;
+
     setSaving(true);
+    setErrorMessage("");
 
     try {
       await updateEntry(id, {
-        title,
-        content,
+        title: title.trim(),
+        content: content.trim(),
         mood: selectedEmoji,
       });
 
-      alert("Entry updated successfully.");
       router.push(`/entry/${id}`);
     } catch (error: any) {
-      alert(error.message || "Failed to update entry.");
+      setErrorMessage(error.message || "Failed to update entry.");
     } finally {
       setSaving(false);
     }
@@ -91,7 +94,10 @@ export default function EditEntryPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-2xl font-bold" style={{ background: COLORS.bg, color: COLORS.text }}>
+      <div
+        className="min-h-screen flex items-center justify-center text-2xl font-bold"
+        style={{ background: COLORS.bg, color: COLORS.text }}
+      >
         Loading...
       </div>
     );
@@ -169,6 +175,12 @@ export default function EditEntryPage() {
             </div>
 
             <div className="px-10 py-5 h-full min-h-0">
+              {errorMessage && (
+                <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+                  {errorMessage}
+                </div>
+              )}
+
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
@@ -176,7 +188,9 @@ export default function EditEntryPage() {
                 className="w-full rounded-xl outline-none resize-none"
                 style={{
                   color: "#333",
-                  height: "calc(100vh - 72px - 56px - 64px - 140px)",
+                  height: errorMessage
+                    ? "calc(100vh - 72px - 56px - 64px - 190px)"
+                    : "calc(100vh - 72px - 56px - 64px - 140px)",
                 }}
               />
             </div>

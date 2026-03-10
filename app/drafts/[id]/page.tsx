@@ -26,7 +26,11 @@ export default function DraftDetailPage() {
   const [mood, setMood] = useState("📝");
   const [createdAt, setCreatedAt] = useState("");
   const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
+
+  const [savingPublish, setSavingPublish] = useState(false);
+  const [savingDraft, setSavingDraft] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const loadDraft = async () => {
@@ -50,7 +54,7 @@ export default function DraftDetailPage() {
           })
         );
       } catch (error: any) {
-        alert(error.message || "Failed to load draft.");
+        setErrorMessage(error.message || "Failed to load draft.");
         router.push("/drafts");
       } finally {
         setLoading(false);
@@ -73,46 +77,50 @@ export default function DraftDetailPage() {
       await signOutUser();
       router.push("/login");
     } catch (error: any) {
-      alert(error.message || "Logout failed.");
+      setErrorMessage(error.message || "Logout failed.");
     }
   }
 
   async function handleSaveAsDraft() {
-    setSaving(true);
+    if (savingPublish || savingDraft || deleting) return;
+
+    setErrorMessage("");
+    setSavingDraft(true);
 
     try {
       await updateDraft(id, {
-        title,
-        content,
+        title: title.trim(),
+        content: content.trim(),
         mood,
       });
 
-      alert("Draft saved successfully.");
       router.push("/drafts");
     } catch (error: any) {
-      alert(error.message || "Failed to save draft.");
+      setErrorMessage(error.message || "Failed to save draft.");
     } finally {
-      setSaving(false);
+      setSavingDraft(false);
     }
   }
 
   async function handlePublish() {
-    setSaving(true);
+    if (savingPublish || savingDraft || deleting) return;
+
+    setErrorMessage("");
+    setSavingPublish(true);
 
     try {
       await updateDraft(id, {
-        title,
-        content,
+        title: title.trim(),
+        content: content.trim(),
         mood,
       });
 
       const entry = await publishDraft(id);
-      alert("Draft published successfully.");
       router.push(`/entry/${entry.id}`);
     } catch (error: any) {
-      alert(error.message || "Failed to publish draft.");
+      setErrorMessage(error.message || "Failed to publish draft.");
     } finally {
-      setSaving(false);
+      setSavingPublish(false);
     }
   }
 
@@ -120,25 +128,37 @@ export default function DraftDetailPage() {
     const confirmed = window.confirm("Delete this draft?");
     if (!confirmed) return;
 
+    if (savingPublish || savingDraft || deleting) return;
+
+    setErrorMessage("");
+    setDeleting(true);
+
     try {
       await deleteDraft(id);
-      alert("Draft deleted.");
       router.push("/drafts");
     } catch (error: any) {
-      alert(error.message || "Failed to delete draft.");
+      setErrorMessage(error.message || "Failed to delete draft.");
+    } finally {
+      setDeleting(false);
     }
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-2xl font-bold" style={{ backgroundColor: COLORS.bg, color: COLORS.text }}>
+      <div
+        className="min-h-screen flex items-center justify-center text-2xl font-bold"
+        style={{ backgroundColor: COLORS.bg, color: COLORS.text }}
+      >
         Loading...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen md:h-screen flex flex-col overflow-hidden" style={{ backgroundColor: COLORS.bg }}>
+    <div
+      className="min-h-screen md:h-screen flex flex-col overflow-hidden"
+      style={{ backgroundColor: COLORS.bg }}
+    >
       <header className="w-full shrink-0" style={{ backgroundColor: COLORS.top }}>
         <div className="w-full px-4 sm:px-6 md:px-10 py-4 flex items-center justify-end">
           <button
@@ -176,7 +196,10 @@ export default function DraftDetailPage() {
                   <span className="text-4xl sm:text-5xl">{mood}</span>
                 </div>
 
-                <div className="mt-2 sm:mt-3 text-xl sm:text-2xl md:text-3xl" style={{ color: "rgba(79,37,42,0.55)" }}>
+                <div
+                  className="mt-2 sm:mt-3 text-xl sm:text-2xl md:text-3xl"
+                  style={{ color: "rgba(79,37,42,0.55)" }}
+                >
                   {createdAt}
                 </div>
               </div>
@@ -194,30 +217,38 @@ export default function DraftDetailPage() {
                   overflow: "hidden",
                 }}
               >
-                <textarea
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="Start writing your draft..."
-                  className="w-full h-[220px] sm:h-[260px] md:h-[300px] p-6 sm:p-10 text-xl sm:text-2xl md:text-3xl leading-relaxed outline-none resize-none"
-                  style={{ backgroundColor: "transparent", color: COLORS.text }}
-                />
+                <div className="p-6 sm:p-10">
+                  {errorMessage && (
+                    <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+                      {errorMessage}
+                    </div>
+                  )}
+
+                  <textarea
+                    value={content}
+                    onChange={(e) => setContent(e.target.value)}
+                    placeholder="Start writing your draft..."
+                    className="w-full h-[220px] sm:h-[260px] md:h-[300px] text-xl sm:text-2xl md:text-3xl leading-relaxed outline-none resize-none"
+                    style={{ backgroundColor: "transparent", color: COLORS.text }}
+                  />
+                </div>
               </div>
 
               <div className="mt-5 sm:mt-7 flex items-center gap-3 sm:gap-6 flex-wrap">
                 <button
                   onClick={handlePublish}
-                  disabled={saving}
+                  disabled={savingPublish || savingDraft || deleting}
                   className="px-10 sm:px-12 py-3 sm:py-4 rounded-xl text-base sm:text-xl font-bold text-white transition shadow-md disabled:opacity-60"
                   style={{ backgroundColor: COLORS.primary }}
                   onMouseEnter={(e) => hoverPrimary(e, true)}
                   onMouseLeave={(e) => hoverPrimary(e, false)}
                 >
-                  {saving ? "Saving..." : "Save"}
+                  {savingPublish ? "Saving..." : "Save"}
                 </button>
 
                 <button
                   onClick={handleSaveAsDraft}
-                  disabled={saving}
+                  disabled={savingPublish || savingDraft || deleting}
                   className="px-10 sm:px-12 py-3 sm:py-4 rounded-xl text-base sm:text-xl font-bold border transition shadow-sm disabled:opacity-60"
                   style={{
                     backgroundColor: COLORS.softWhite,
@@ -225,19 +256,20 @@ export default function DraftDetailPage() {
                     color: COLORS.text,
                   }}
                 >
-                  Save as Draft
+                  {savingDraft ? "Saving Draft..." : "Save as Draft"}
                 </button>
 
                 <button
                   onClick={handleDelete}
-                  className="px-10 sm:px-12 py-3 sm:py-4 rounded-xl text-base sm:text-xl font-bold border transition shadow-sm"
+                  disabled={savingPublish || savingDraft || deleting}
+                  className="px-10 sm:px-12 py-3 sm:py-4 rounded-xl text-base sm:text-xl font-bold border transition shadow-sm disabled:opacity-60"
                   style={{
                     backgroundColor: COLORS.softWhite,
                     borderColor: COLORS.border,
                     color: "#cc1f1f",
                   }}
                 >
-                  Delete
+                  {deleting ? "Deleting..." : "Delete"}
                 </button>
               </div>
             </div>
