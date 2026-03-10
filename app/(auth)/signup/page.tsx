@@ -52,10 +52,8 @@ export default function SignupPage() {
 
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
-      {/* Background */}
       <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#fbe3b9] via-[#edd0ac] to-[#fbe3b9]" />
 
-      {/* Header */}
       <header className="relative z-10 w-full bg-[#4f252a] border-b border-[#3a1b1f] shadow-md">
         <div className="w-full px-4 sm:px-8 lg:px-10 h-[72px] flex items-center justify-between">
           <Link href="/" className="text-white font-bold text-lg sm:text-xl tracking-wide">
@@ -80,10 +78,8 @@ export default function SignupPage() {
         </div>
       </header>
 
-      {/* Body */}
       <main className="relative z-10 flex-1 overflow-hidden">
         <div className="h-full flex flex-col lg:flex-row">
-          {/* Sidebar */}
           <aside className="relative z-10 w-full lg:w-[420px] bg-[#fbe3b9] border-b lg:border-b-0 lg:border-r border-[#e6c9a4] px-5 sm:px-8 py-8 flex flex-col">
             <div className="flex flex-col items-start">
               <img
@@ -129,7 +125,6 @@ export default function SignupPage() {
               </div>
             </div>
 
-            {/* Book image: stays consistent, but hides on small height screens */}
             <div className="mt-8 lg:mt-auto pt-2 hidden lg:block">
               <img
                 src="/images/Book-flower.png"
@@ -140,7 +135,6 @@ export default function SignupPage() {
             </div>
           </aside>
 
-          {/* Form Area */}
           <section className="relative flex-1 overflow-hidden">
             <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-br from-[#edd0ac] via-[#fbe3b9] to-[#edd0ac]" />
             <div className="absolute -top-28 -right-28 z-0 pointer-events-none h-80 w-80 rounded-full bg-[#e06464]/25 blur-3xl" />
@@ -255,7 +249,6 @@ export default function SignupPage() {
                   </form>
                 </div>
 
-                {/* Book image for mobile (below form) */}
                 <div className="mt-6 flex justify-center lg:hidden">
                   <img
                     src="/images/Book-flower.png"
@@ -270,7 +263,6 @@ export default function SignupPage() {
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="relative z-10 w-full bg-[#4f252a] border-t border-[#3a1b1f]">
         <div className="w-full px-4 sm:px-8 lg:px-10 py-4 flex flex-wrap items-center justify-center gap-x-10 gap-y-2 text-xs sm:text-sm font-medium text-white">
           <div className="flex items-center gap-2">
