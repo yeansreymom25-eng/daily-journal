@@ -19,10 +19,14 @@ export default function NewEntryPage() {
 
   const [user, setUser] = useState<User | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
+
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [selectedEmoji, setSelectedEmoji] = useState<string>("");
-  const [saving, setSaving] = useState(false);
+
+  const [savingEntry, setSavingEntry] = useState(false);
+  const [savingDraft, setSavingDraft] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const emojis = useMemo(
     () => [
@@ -55,57 +59,60 @@ export default function NewEntryPage() {
       await signOutUser();
       router.push("/login");
     } catch (error: any) {
-      alert(error.message || "Logout failed.");
+      setErrorMessage(error.message || "Logout failed.");
     }
   }
 
   async function onSave() {
-    if (!user) return;
+    if (!user || savingEntry || savingDraft) return;
 
-    setSaving(true);
+    setErrorMessage("");
+    setSavingEntry(true);
 
     try {
       const entry = await createEntry({
         user_id: user.id,
-        title,
-        content,
+        title: title.trim(),
+        content: content.trim(),
         mood: selectedEmoji,
       });
 
-      alert("Entry saved successfully.");
       router.push(`/entry/${entry.id}`);
     } catch (error: any) {
-      alert(error.message || "Failed to save entry.");
+      setErrorMessage(error.message || "Failed to save entry.");
     } finally {
-      setSaving(false);
+      setSavingEntry(false);
     }
   }
 
   async function onSaveDraft() {
-    if (!user) return;
+    if (!user || savingEntry || savingDraft) return;
 
-    setSaving(true);
+    setErrorMessage("");
+    setSavingDraft(true);
 
     try {
       const draft = await createDraft({
         user_id: user.id,
-        title,
-        content,
+        title: title.trim(),
+        content: content.trim(),
         mood: selectedEmoji,
       });
 
-      alert("Draft saved successfully.");
       router.push(`/drafts/${draft.id}`);
     } catch (error: any) {
-      alert(error.message || "Failed to save draft.");
+      setErrorMessage(error.message || "Failed to save draft.");
     } finally {
-      setSaving(false);
+      setSavingDraft(false);
     }
   }
 
   if (authLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-2xl font-bold" style={{ background: COLORS.bg, color: COLORS.text }}>
+      <div
+        className="min-h-screen flex items-center justify-center text-2xl font-bold"
+        style={{ background: COLORS.bg, color: COLORS.text }}
+      >
         Loading...
       </div>
     );
@@ -183,6 +190,12 @@ export default function NewEntryPage() {
             </div>
 
             <div className="px-10 py-5 h-full min-h-0">
+              {errorMessage && (
+                <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+                  {errorMessage}
+                </div>
+              )}
+
               <textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
@@ -190,7 +203,9 @@ export default function NewEntryPage() {
                 className="w-full rounded-xl outline-none resize-none"
                 style={{
                   color: "#333",
-                  height: "calc(100vh - 72px - 56px - 64px - 140px)",
+                  height: errorMessage
+                    ? "calc(100vh - 72px - 56px - 64px - 190px)"
+                    : "calc(100vh - 72px - 56px - 64px - 140px)",
                 }}
               />
             </div>
@@ -206,26 +221,26 @@ export default function NewEntryPage() {
           <div className="flex justify-center gap-10 mt-5 flex-shrink-0">
             <button
               onClick={onSave}
-              disabled={saving}
+              disabled={savingEntry || savingDraft}
               className="px-16 py-4 rounded-2xl font-extrabold text-lg transition shadow-md disabled:opacity-60"
               style={{
                 background: COLORS.primary,
                 color: "white",
               }}
             >
-              {saving ? "Saving..." : "Save"}
+              {savingEntry ? "Saving..." : "Save"}
             </button>
 
             <button
               onClick={onSaveDraft}
-              disabled={saving}
+              disabled={savingEntry || savingDraft}
               className="px-14 py-4 rounded-2xl font-extrabold text-lg transition shadow-md disabled:opacity-60"
               style={{
                 background: "#d9d9d9",
                 color: "#111",
               }}
             >
-              Save as Draft
+              {savingDraft ? "Saving Draft..." : "Save as Draft"}
             </button>
           </div>
         </div>
