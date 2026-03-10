@@ -7,11 +7,15 @@ import { supabase } from "@/lib/supabase";
 
 export default function SignupPage() {
   const router = useRouter();
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
   const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
 
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -19,31 +23,40 @@ export default function SignupPage() {
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
 
+    setMessage("");
+    setErrorMessage("");
+
     if (password !== confirmPassword) {
-      alert("Passwords do not match.");
+      setErrorMessage("Passwords do not match.");
       return;
     }
 
     setLoading(true);
 
+    const siteUrl =
+      process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000";
+
     const { data, error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        data: { full_name: fullName },
+        data: {
+          full_name: fullName,
+        },
+        emailRedirectTo: `${siteUrl}/login`,
       },
     });
 
     setLoading(false);
 
     if (error) {
-      alert(error.message);
+      setErrorMessage(error.message);
       return;
     }
 
     if (!data.session) {
-      alert("Account created! Please check your email to confirm.");
-      router.push("/login");
+      setMessage("Account created successfully. Please check your email to confirm your account.");
+      router.push("/check-email");
       return;
     }
 
@@ -150,6 +163,18 @@ export default function SignupPage() {
                   <p className="text-center text-[#4f252a]/70 mb-5 sm:mb-6 text-sm sm:text-base">
                     Please enter your details below
                   </p>
+
+                  {message && (
+                    <div className="mb-4 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm sm:text-base text-green-700">
+                      {message}
+                    </div>
+                  )}
+
+                  {errorMessage && (
+                    <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm sm:text-base text-red-700">
+                      {errorMessage}
+                    </div>
+                  )}
 
                   <form onSubmit={onSubmit} className="space-y-4 sm:space-y-5">
                     <div>

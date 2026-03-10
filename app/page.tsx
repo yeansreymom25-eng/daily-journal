@@ -7,7 +7,7 @@ export default function WelcomePage() {
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-br from-[#fbe3b9] via-[#edd0ac] to-[#fbe3b9]" />
 
-      {/* 🔥 DARK TOP BAR */}
+      {/* TOP BAR */}
       <header className="relative w-full bg-[#4f252a] border-b border-[#3a1b1f] shadow-md">
         <nav className="mx-auto max-w-6xl px-10 py-6 flex items-center justify-end">
 
@@ -15,7 +15,7 @@ export default function WelcomePage() {
             <Link
               href="/login"
               className="px-6 py-3 rounded-xl bg-white/20 hover:bg-white/30
-                         text-white font-semibold transition"
+              text-white font-semibold transition"
             >
               Login
             </Link>
@@ -23,7 +23,7 @@ export default function WelcomePage() {
             <Link
               href="/signup"
               className="px-6 py-3 rounded-xl bg-[#e06464] hover:bg-[#f1745e]
-                         text-white font-semibold shadow-md transition"
+              text-white font-semibold shadow-md transition"
             >
               Sign Up
             </Link>
@@ -61,7 +61,7 @@ export default function WelcomePage() {
         </Link>
       </main>
 
-      {/* 🔥 DARK FOOTER */}
+      {/*OOTER */}
       <footer className="relative w-full bg-[#4f252a] border-t border-[#3a1b1f]">
         <div className="mx-auto max-w-6xl px-10 py-6 flex items-center justify-center gap-20 text-lg font-medium text-white">
 
