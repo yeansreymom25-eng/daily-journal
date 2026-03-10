@@ -89,8 +89,8 @@ export default function DraftDetailPage() {
 
     try {
       await updateDraft(id, {
-        title: title.trim(),
-        content: content.trim(),
+        title,
+        content,
         mood,
       });
 
@@ -110,8 +110,8 @@ export default function DraftDetailPage() {
 
     try {
       await updateDraft(id, {
-        title: title.trim(),
-        content: content.trim(),
+        title,
+        content,
         mood,
       });
 
@@ -127,7 +127,6 @@ export default function DraftDetailPage() {
   async function handleDelete() {
     const confirmed = window.confirm("Delete this draft?");
     if (!confirmed) return;
-
     if (savingPublish || savingDraft || deleting) return;
 
     setErrorMessage("");
@@ -206,6 +205,12 @@ export default function DraftDetailPage() {
             </div>
           </div>
 
+          {errorMessage && (
+            <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-700 shrink-0">
+              {errorMessage}
+            </div>
+          )}
+
           <div className="mt-6 sm:mt-10 flex gap-6 lg:gap-12 items-start flex-1 overflow-hidden flex-col lg:flex-row">
             <div className="flex-1 flex flex-col min-w-0 w-full">
               <div
@@ -217,21 +222,13 @@ export default function DraftDetailPage() {
                   overflow: "hidden",
                 }}
               >
-                <div className="p-6 sm:p-10">
-                  {errorMessage && (
-                    <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
-                      {errorMessage}
-                    </div>
-                  )}
-
-                  <textarea
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    placeholder="Start writing your draft..."
-                    className="w-full h-[220px] sm:h-[260px] md:h-[300px] text-xl sm:text-2xl md:text-3xl leading-relaxed outline-none resize-none"
-                    style={{ backgroundColor: "transparent", color: COLORS.text }}
-                  />
-                </div>
+                <textarea
+                  value={content}
+                  onChange={(e) => setContent(e.target.value)}
+                  placeholder="Start writing your draft..."
+                  className="w-full h-[220px] sm:h-[260px] md:h-[300px] p-6 sm:p-10 text-xl sm:text-2xl md:text-3xl leading-relaxed outline-none resize-none"
+                  style={{ backgroundColor: "transparent", color: COLORS.text }}
+                />
               </div>
 
               <div className="mt-5 sm:mt-7 flex items-center gap-3 sm:gap-6 flex-wrap">
