@@ -125,8 +125,6 @@ export default function DraftDetailPage() {
   }
 
   async function handleDelete() {
-    const confirmed = window.confirm("Delete this draft?");
-    if (!confirmed) return;
     if (savingPublish || savingDraft || deleting) return;
 
     setErrorMessage("");
