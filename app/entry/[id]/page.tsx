@@ -74,18 +74,14 @@ export default function EntryDetailPage() {
     }
   }
 
-  async function handleDelete() {
-    const confirmed = window.confirm("Delete this journal entry?");
-    if (!confirmed) return;
-
-    try {
-      await deleteEntry(id);
-      alert("Entry deleted.");
-      router.push("/dashboard");
-    } catch (error: any) {
-      alert(error.message || "Failed to delete entry.");
-    }
+ async function handleDelete() {
+  try {
+    await deleteEntry(id);
+    router.push("/dashboard");
+  } catch (error: any) {
+    console.error(error);
   }
+}
 
   if (loading) {
     return (
