@@ -88,7 +88,7 @@ export default function LoginPage() {
 
             <div className="rounded-2xl border border-black/10 bg-white/55 px-5 py-4">
               <div className="flex items-center gap-3 text-[#4f252a] font-bold text-base">
-                <span className="text-lg">📝</span> Draft anytime
+                <span className="text-lg"></span> Draft anytime
               </div>
               <p className="mt-1 text-[#4f252a]/75 text-sm">
                 Save unfinished thoughts and come back later.
