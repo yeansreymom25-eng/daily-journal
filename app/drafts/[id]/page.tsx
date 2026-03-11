@@ -184,14 +184,14 @@ export default function DraftDetailPage() {
               </button>
 
               <div className="min-w-0">
-                <div className="flex items-center gap-3 sm:gap-4">
+                <div className="flex items-center gap-3 sm:gap-4 min-w-0">
                   <input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="text-4xl sm:text-5xl md:text-6xl font-extrabold truncate bg-transparent outline-none w-full"
+                    className="flex-1 min-w-0 bg-transparent outline-none text-4xl sm:text-5xl md:text-6xl font-extrabold"
                     style={{ color: COLORS.text }}
                   />
-                  <span className="text-4xl sm:text-5xl">{mood}</span>
+                  <span className="text-4xl sm:text-5xl flex-shrink-0">{mood}</span>
                 </div>
 
                 <div
