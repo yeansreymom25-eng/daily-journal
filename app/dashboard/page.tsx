@@ -15,6 +15,7 @@ export default function DashboardPage() {
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [drafts, setDrafts] = useState<JournalDraft[]>([]);
   const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState("");
 
   const COLORS = {
     bg: "#edd0ac",
@@ -45,7 +46,7 @@ export default function DashboardPage() {
         setEntries(entriesData);
         setDrafts(draftsData);
       } catch (error: any) {
-        alert(error.message || "Failed to load dashboard.");
+        setErrorMessage(error.message || "Failed to load dashboard.");
       } finally {
         setLoading(false);
       }
@@ -68,36 +69,36 @@ export default function DashboardPage() {
       await signOutUser();
       router.push("/login");
     } catch (error: any) {
-      alert(error.message || "Logout failed.");
+      setErrorMessage(error.message || "Logout failed.");
     }
   }
 
   async function handleDeleteEntry(id: string) {
-    const confirmed = window.confirm("Delete this journal entry?");
-    if (!confirmed) return;
-
     try {
       const { deleteEntry } = await import("@/lib/journal");
       await deleteEntry(id);
       setEntries((prev) => prev.filter((item) => item.id !== id));
     } catch (error: any) {
-      alert(error.message || "Failed to delete entry.");
+      setErrorMessage(error.message || "Failed to delete entry.");
     }
   }
 
   async function handleDeleteDraft(id: string) {
-  try {
-    const { deleteDraft } = await import("@/lib/journal");
-    await deleteDraft(id);
-    setDrafts((prev) => prev.filter((item) => item.id !== id));
-  } catch (error: any) {
-    console.error(error);
+    try {
+      const { deleteDraft } = await import("@/lib/journal");
+      await deleteDraft(id);
+      setDrafts((prev) => prev.filter((item) => item.id !== id));
+    } catch (error: any) {
+      setErrorMessage(error.message || "Failed to delete draft.");
+    }
   }
-}
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-2xl font-bold" style={{ backgroundColor: COLORS.bg, color: COLORS.text }}>
+      <div
+        className="min-h-screen flex items-center justify-center text-2xl font-bold"
+        style={{ backgroundColor: COLORS.bg, color: COLORS.text }}
+      >
         Loading...
       </div>
     );
@@ -236,6 +237,12 @@ export default function DashboardPage() {
               </button>
             </div>
           </div>
+
+          {errorMessage && (
+            <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+              {errorMessage}
+            </div>
+          )}
 
           <div
             className="mt-8 bg-white rounded-xl border overflow-hidden"
