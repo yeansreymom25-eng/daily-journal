@@ -23,6 +23,15 @@ export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
+  const [errorMessage, setErrorMessage] = useState("");
+  const [successMessage, setSuccessMessage] = useState("");
+
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [changingPassword, setChangingPassword] = useState(false);
+  const [deletingAccount, setDeletingAccount] = useState(false);
+
   useEffect(() => {
     const loadUser = async () => {
       const currentUser = await getCurrentUser();
@@ -46,12 +55,14 @@ export default function SettingsPage() {
       await signOutUser();
       router.push("/login");
     } catch (error: any) {
-      alert(error.message || "Logout failed.");
+      setErrorMessage(error.message || "Logout failed.");
     }
   }
 
   async function handleSaveChanges() {
     setSaving(true);
+    setErrorMessage("");
+    setSuccessMessage("");
 
     try {
       const payload: {
@@ -73,22 +84,34 @@ export default function SettingsPage() {
         throw error;
       }
 
-      alert(
+      setSuccessMessage(
         user?.email !== email
           ? "Profile updated. Check your email to confirm the new email address."
           : "Profile updated successfully."
       );
     } catch (error: any) {
-      alert(error.message || "Failed to save changes.");
+      setErrorMessage(error.message || "Failed to save changes.");
     } finally {
       setSaving(false);
     }
   }
 
-  async function handleChangePassword() {
-    const newPassword = window.prompt("Enter your new password:");
+  function openPasswordModal() {
+    setErrorMessage("");
+    setSuccessMessage("");
+    setNewPassword("");
+    setShowPasswordModal(true);
+  }
 
-    if (!newPassword) return;
+  async function handleChangePassword() {
+    if (!newPassword.trim()) {
+      setErrorMessage("Please enter your new password.");
+      return;
+    }
+
+    setChangingPassword(true);
+    setErrorMessage("");
+    setSuccessMessage("");
 
     try {
       const { error } = await supabase.auth.updateUser({
@@ -99,18 +122,26 @@ export default function SettingsPage() {
         throw error;
       }
 
-      alert("Password updated successfully.");
+      setShowPasswordModal(false);
+      setNewPassword("");
+      setSuccessMessage("Password updated successfully.");
     } catch (error: any) {
-      alert(error.message || "Failed to change password.");
+      setErrorMessage(error.message || "Failed to change password.");
+    } finally {
+      setChangingPassword(false);
     }
   }
 
-  async function handleDeleteAccount() {
-    const confirmed = window.confirm(
-      "Are you sure you want to delete your account? This cannot be undone."
-    );
+  function openDeleteModal() {
+    setErrorMessage("");
+    setSuccessMessage("");
+    setShowDeleteModal(true);
+  }
 
-    if (!confirmed) return;
+  async function handleDeleteAccount() {
+    setDeletingAccount(true);
+    setErrorMessage("");
+    setSuccessMessage("");
 
     try {
       const { error } = await supabase.rpc("delete_current_user");
@@ -120,23 +151,27 @@ export default function SettingsPage() {
       }
 
       await supabase.auth.signOut();
-      alert("Your account has been deleted.");
       router.push("/signup");
     } catch (error: any) {
-      alert(error.message || "Failed to delete account.");
+      setErrorMessage(error.message || "Failed to delete account.");
+      setDeletingAccount(false);
+      setShowDeleteModal(false);
     }
   }
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-2xl font-bold" style={{ backgroundColor: COLORS.bg, color: COLORS.text }}>
+      <div
+        className="min-h-screen flex items-center justify-center text-2xl font-bold"
+        style={{ backgroundColor: COLORS.bg, color: COLORS.text }}
+      >
         Loading...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: COLORS.bg }}>
+    <div className="min-h-screen flex flex-col relative" style={{ backgroundColor: COLORS.bg }}>
       <header className="w-full border-b shadow-md" style={{ backgroundColor: COLORS.top }}>
         <div className="w-full px-4 sm:px-6 md:px-8 py-4 flex items-center justify-between">
           <button onClick={() => router.back()} className="text-white text-base sm:text-lg font-semibold">
@@ -160,7 +195,10 @@ export default function SettingsPage() {
       </header>
 
       <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6">
-        <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-8 sm:mb-10 text-center" style={{ color: COLORS.text }}>
+        <h1
+          className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-8 sm:mb-10 text-center"
+          style={{ color: COLORS.text }}
+        >
           Settings
         </h1>
 
@@ -168,6 +206,18 @@ export default function SettingsPage() {
           <p className="text-gray-600 mb-8 text-center text-sm sm:text-base">
             Manage your account preferences.
           </p>
+
+          {errorMessage && (
+            <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+              {errorMessage}
+            </div>
+          )}
+
+          {successMessage && (
+            <div className="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-green-700">
+              {successMessage}
+            </div>
+          )}
 
           <div className="mb-6">
             <label className="block mb-2 font-semibold text-gray-800">
@@ -204,7 +254,7 @@ export default function SettingsPage() {
                 e.currentTarget.style.backgroundColor = COLORS.primary;
               }}
               onClick={handleSaveChanges}
-              disabled={saving}
+              disabled={saving || changingPassword || deletingAccount}
             >
               {saving ? "Saving..." : "Save Changes"}
             </button>
@@ -216,20 +266,95 @@ export default function SettingsPage() {
                 color: COLORS.text,
                 borderColor: COLORS.text,
               }}
-              onClick={handleChangePassword}
+              onClick={openPasswordModal}
+              disabled={saving || changingPassword || deletingAccount}
             >
               Change Password
             </button>
 
             <button
               className="px-6 py-3 rounded-lg font-bold border border-red-400 text-red-600"
-              onClick={handleDeleteAccount}
+              onClick={openDeleteModal}
+              disabled={saving || changingPassword || deletingAccount}
             >
               Delete Account
             </button>
           </div>
         </div>
       </main>
+
+      {showPasswordModal && (
+        <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl border p-6">
+            <h2 className="text-2xl font-extrabold text-[#4f252a] mb-3">
+              Change Password
+            </h2>
+            <p className="text-[#4f252a]/75 mb-4">
+              Enter your new password below.
+            </p>
+
+            <input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="Enter your new password"
+              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f1745e]"
+            />
+
+            <div className="mt-5 flex justify-end gap-3">
+              <button
+                onClick={() => {
+                  setShowPasswordModal(false);
+                  setNewPassword("");
+                }}
+                className="px-5 py-2 rounded-lg font-bold border text-[#4f252a]"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleChangePassword}
+                disabled={changingPassword}
+                className="px-5 py-2 rounded-lg font-bold text-white disabled:opacity-60"
+                style={{ backgroundColor: COLORS.primary }}
+              >
+                {changingPassword ? "Saving..." : "Save"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center px-4">
+          <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl border p-6">
+            <h2 className="text-2xl font-extrabold text-[#4f252a] mb-3">
+              Delete Account
+            </h2>
+            <p className="text-[#4f252a]/75 mb-5">
+              Are you sure you want to delete your account? This cannot be undone.
+            </p>
+
+            <div className="flex justify-end gap-3">
+              <button
+                onClick={() => setShowDeleteModal(false)}
+                className="px-5 py-2 rounded-lg font-bold border text-[#4f252a]"
+              >
+                Cancel
+              </button>
+
+              <button
+                onClick={handleDeleteAccount}
+                disabled={deletingAccount}
+                className="px-5 py-2 rounded-lg font-bold text-white disabled:opacity-60"
+                style={{ backgroundColor: "#dc2626" }}
+              >
+                {deletingAccount ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
