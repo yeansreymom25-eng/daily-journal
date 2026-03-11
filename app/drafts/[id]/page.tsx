@@ -13,6 +13,7 @@ export default function DraftDetailPage() {
   const COLORS = {
     bg: "#edd0ac",
     top: "#4f252a",
+    side: "#fbf3b9",
     text: "#4f252a",
     primary: "#f1745e",
     primaryHover: "#e06464",
@@ -156,7 +157,7 @@ export default function DraftDetailPage() {
       className="min-h-screen md:h-screen flex flex-col overflow-hidden"
       style={{ backgroundColor: COLORS.bg }}
     >
-      <header className="w-full shrink-0" style={{ backgroundColor: COLORS.top }}>
+      <header className="w-full flex-shrink-0" style={{ backgroundColor: COLORS.top }}>
         <div className="w-full px-4 sm:px-6 md:px-10 py-4 flex items-center justify-end">
           <button
             onClick={handleLogout}
@@ -170,19 +171,19 @@ export default function DraftDetailPage() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-hidden px-4 sm:px-6 md:px-10 pt-6 md:pt-10 pb-8">
+      <main className="flex-1 overflow-hidden px-4 sm:px-6 md:px-10 py-6">
         <div className="mx-auto w-full max-w-6xl h-full flex flex-col">
-          <div className="flex items-start justify-between shrink-0">
-            <div className="flex items-start gap-4 sm:gap-6">
+          <div className="flex items-center justify-between flex-shrink-0">
+            <div className="flex items-center gap-4 sm:gap-6 min-w-0">
               <button
                 onClick={() => router.push("/drafts")}
-                className="text-5xl sm:text-6xl font-bold leading-none mt-1 sm:mt-2"
+                className="text-5xl sm:text-6xl font-bold leading-none"
                 style={{ color: COLORS.text }}
               >
                 ←
               </button>
 
-              <div className="min-w-0 w-full">
+              <div className="min-w-0">
                 <div className="flex items-center gap-3 sm:gap-4">
                   <input
                     value={title}
@@ -194,7 +195,7 @@ export default function DraftDetailPage() {
                 </div>
 
                 <div
-                  className="mt-2 sm:mt-3 text-xl sm:text-2xl md:text-3xl"
+                  className="mt-2 text-xl sm:text-2xl md:text-3xl"
                   style={{ color: "rgba(79,37,42,0.55)" }}
                 >
                   {createdAt}
@@ -204,72 +205,30 @@ export default function DraftDetailPage() {
           </div>
 
           {errorMessage && (
-            <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-700 shrink-0">
+            <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
               {errorMessage}
             </div>
           )}
 
-          <div className="mt-6 sm:mt-10 flex gap-6 lg:gap-12 items-start flex-1 overflow-hidden flex-col lg:flex-row">
-            <div className="flex-1 flex flex-col min-w-0 w-full">
-              <div
-                className="rounded-2xl border"
-                style={{
-                  backgroundColor: COLORS.card,
-                  borderColor: COLORS.border,
-                  boxShadow: "0 18px 35px rgba(79,37,42,0.18)",
-                  overflow: "hidden",
-                }}
-              >
-                <textarea
-                  value={content}
-                  onChange={(e) => setContent(e.target.value)}
-                  placeholder="Start writing your draft..."
-                  className="w-full h-[220px] sm:h-[260px] md:h-[300px] p-6 sm:p-10 text-xl sm:text-2xl md:text-3xl leading-relaxed outline-none resize-none"
-                  style={{ backgroundColor: "transparent", color: COLORS.text }}
-                />
-              </div>
-
-              <div className="mt-5 sm:mt-7 flex items-center gap-3 sm:gap-6 flex-wrap">
-                <button
-                  onClick={handlePublish}
-                  disabled={savingPublish || savingDraft || deleting}
-                  className="px-10 sm:px-12 py-3 sm:py-4 rounded-xl text-base sm:text-xl font-bold text-white transition shadow-md disabled:opacity-60"
-                  style={{ backgroundColor: COLORS.primary }}
-                  onMouseEnter={(e) => hoverPrimary(e, true)}
-                  onMouseLeave={(e) => hoverPrimary(e, false)}
-                >
-                  {savingPublish ? "Saving..." : "Save"}
-                </button>
-
-                <button
-                  onClick={handleSaveAsDraft}
-                  disabled={savingPublish || savingDraft || deleting}
-                  className="px-10 sm:px-12 py-3 sm:py-4 rounded-xl text-base sm:text-xl font-bold border transition shadow-sm disabled:opacity-60"
-                  style={{
-                    backgroundColor: COLORS.softWhite,
-                    borderColor: COLORS.border,
-                    color: COLORS.text,
-                  }}
-                >
-                  {savingDraft ? "Saving Draft..." : "Save as Draft"}
-                </button>
-
-                <button
-                  onClick={handleDelete}
-                  disabled={savingPublish || savingDraft || deleting}
-                  className="px-10 sm:px-12 py-3 sm:py-4 rounded-xl text-base sm:text-xl font-bold border transition shadow-sm disabled:opacity-60"
-                  style={{
-                    backgroundColor: COLORS.softWhite,
-                    borderColor: COLORS.border,
-                    color: "#cc1f1f",
-                  }}
-                >
-                  {deleting ? "Deleting..." : "Delete"}
-                </button>
-              </div>
+          <div className="mt-6 flex-1 flex gap-6 lg:gap-10 items-start overflow-hidden flex-col lg:flex-row">
+            <div
+              className="flex-1 rounded-2xl border p-6 sm:p-10 h-full overflow-hidden w-full"
+              style={{
+                backgroundColor: COLORS.card,
+                borderColor: COLORS.border,
+                boxShadow: "0 18px 35px rgba(79,37,42,0.18)",
+              }}
+            >
+              <textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Start writing your draft..."
+                className="w-full h-full outline-none resize-none text-xl sm:text-2xl md:text-3xl leading-relaxed whitespace-pre-wrap"
+                style={{ backgroundColor: "transparent", color: COLORS.text }}
+              />
             </div>
 
-            <div className="hidden lg:block w-[420px] relative">
+            <div className="hidden lg:block w-[360px] relative h-full overflow-hidden">
               <img
                 src="/images/coffee.png"
                 alt="Coffee"
@@ -278,6 +237,45 @@ export default function DraftDetailPage() {
                 style={{ marginLeft: "-60px", marginTop: "20px" }}
               />
             </div>
+          </div>
+
+          <div className="mt-6 flex items-center gap-4 sm:gap-10 flex-shrink-0 flex-wrap">
+            <button
+              onClick={handlePublish}
+              disabled={savingPublish || savingDraft || deleting}
+              className="px-10 sm:px-16 py-4 sm:py-5 rounded-xl text-xl sm:text-3xl font-bold text-white transition disabled:opacity-60"
+              style={{ backgroundColor: COLORS.primary }}
+              onMouseEnter={(e) => hoverPrimary(e, true)}
+              onMouseLeave={(e) => hoverPrimary(e, false)}
+            >
+              {savingPublish ? "Saving..." : "Save"}
+            </button>
+
+            <button
+              onClick={handleSaveAsDraft}
+              disabled={savingPublish || savingDraft || deleting}
+              className="px-10 sm:px-16 py-4 sm:py-5 rounded-xl text-xl sm:text-3xl font-bold border transition disabled:opacity-60"
+              style={{
+                backgroundColor: "rgba(255,255,255,0.55)",
+                borderColor: COLORS.border,
+                color: COLORS.text,
+              }}
+            >
+              {savingDraft ? "Saving Draft..." : "Save as Draft"}
+            </button>
+
+            <button
+              onClick={handleDelete}
+              disabled={savingPublish || savingDraft || deleting}
+              className="px-10 sm:px-16 py-4 sm:py-5 rounded-xl text-xl sm:text-3xl font-bold border transition disabled:opacity-60"
+              style={{
+                backgroundColor: "rgba(255,255,255,0.55)",
+                borderColor: COLORS.border,
+                color: "#cc1f1f",
+              }}
+            >
+              {deleting ? "Deleting..." : "Delete"}
+            </button>
           </div>
         </div>
       </main>
