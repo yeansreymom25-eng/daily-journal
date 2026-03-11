@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { deleteEntry, getEntryById } from "@/lib/journal";
 import { getCurrentUser, signOutUser } from "@/lib/auth";
+import { deleteDraft, getDraftById, publishDraft, updateDraft } from "@/lib/journal";
 
-export default function EntryDetailPage() {
+export default function DraftDetailPage() {
   const router = useRouter();
   const params = useParams();
   const id = String(params?.id || "");
@@ -19,6 +19,7 @@ export default function EntryDetailPage() {
     primaryHover: "#e06464",
     border: "rgba(79,37,42,0.22)",
     card: "rgba(255,255,255,0.65)",
+    softWhite: "rgba(255,255,255,0.55)",
   };
 
   const [title, setTitle] = useState("");
@@ -26,11 +27,14 @@ export default function EntryDetailPage() {
   const [mood, setMood] = useState("");
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(true);
+
+  const [savingPublish, setSavingPublish] = useState(false);
+  const [savingDraft, setSavingDraft] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
-    const loadEntry = async () => {
+    const loadDraft = async () => {
       const user = await getCurrentUser();
 
       if (!user) {
@@ -39,30 +43,30 @@ export default function EntryDetailPage() {
       }
 
       try {
-        const entry = await getEntryById(id);
+        const draft = await getDraftById(id);
 
-        setTitle(entry.title || "Untitled Entry");
-        setMood(entry.mood || "📝");
-        setContent(entry.content || "");
+        setTitle(draft.title || "Untitled Draft");
+        setMood(draft.mood || "📝");
+        setContent(draft.content || "");
         setDate(
-          new Date(entry.created_at).toLocaleDateString("en-US", {
+          new Date(draft.created_at).toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",
             day: "numeric",
           })
         );
       } catch (error: any) {
-        setErrorMessage(error.message || "Failed to load entry.");
+        setErrorMessage(error.message || "Failed to load draft.");
       } finally {
         setLoading(false);
       }
     };
 
     if (id) {
-      loadEntry();
+      loadDraft();
     } else {
       setLoading(false);
-      setErrorMessage("Invalid entry ID.");
+      setErrorMessage("Invalid draft ID.");
     }
   }, [id, router]);
 
@@ -79,17 +83,57 @@ export default function EntryDetailPage() {
     }
   }
 
+  async function handleSaveAsDraft() {
+    if (!id || savingPublish || savingDraft || deleting) return;
+
+    setSavingDraft(true);
+    setErrorMessage("");
+
+    try {
+      await updateDraft(id, {
+        title,
+        content,
+        mood,
+      });
+      router.push("/drafts");
+    } catch (error: any) {
+      setErrorMessage(error.message || "Failed to save draft.");
+      setSavingDraft(false);
+    }
+  }
+
+  async function handlePublish() {
+    if (!id || savingPublish || savingDraft || deleting) return;
+
+    setSavingPublish(true);
+    setErrorMessage("");
+
+    try {
+      await updateDraft(id, {
+        title,
+        content,
+        mood,
+      });
+
+      const entry = await publishDraft(id);
+      router.push(`/entry/${entry.id}`);
+    } catch (error: any) {
+      setErrorMessage(error.message || "Failed to publish draft.");
+      setSavingPublish(false);
+    }
+  }
+
   async function handleDelete() {
-    if (!id || deleting) return;
+    if (!id || savingPublish || savingDraft || deleting) return;
 
     setDeleting(true);
     setErrorMessage("");
 
     try {
-      await deleteEntry(id);
-      router.push("/dashboard");
+      await deleteDraft(id);
+      router.push("/drafts");
     } catch (error: any) {
-      setErrorMessage(error.message || "Failed to delete entry.");
+      setErrorMessage(error.message || "Failed to delete draft.");
       setDeleting(false);
     }
   }
@@ -129,7 +173,7 @@ export default function EntryDetailPage() {
           <div className="flex items-center justify-between flex-shrink-0">
             <div className="flex items-center gap-4 sm:gap-6 min-w-0">
               <button
-                onClick={() => router.push("/dashboard")}
+                onClick={() => router.push("/drafts")}
                 className="text-5xl sm:text-6xl font-bold leading-none"
                 style={{ color: COLORS.text }}
               >
@@ -138,12 +182,12 @@ export default function EntryDetailPage() {
 
               <div className="min-w-0">
                 <div className="flex items-center gap-3 sm:gap-4">
-                  <h1
-                    className="text-4xl sm:text-5xl md:text-6xl font-extrabold truncate"
+                  <input
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    className="text-4xl sm:text-5xl md:text-6xl font-extrabold truncate bg-transparent outline-none w-full"
                     style={{ color: COLORS.text }}
-                  >
-                    {title}
-                  </h1>
+                  />
                   <span className="text-4xl sm:text-5xl">{mood}</span>
                 </div>
 
@@ -172,12 +216,13 @@ export default function EntryDetailPage() {
                 boxShadow: "0 18px 35px rgba(79,37,42,0.18)",
               }}
             >
-              <p
-                className="text-xl sm:text-2xl md:text-3xl leading-relaxed whitespace-pre-wrap"
-                style={{ color: COLORS.text }}
-              >
-                {content}
-              </p>
+              <textarea
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="Start writing your draft..."
+                className="w-full h-full outline-none resize-none text-xl sm:text-2xl md:text-3xl leading-relaxed whitespace-pre-wrap"
+                style={{ backgroundColor: "transparent", color: COLORS.text }}
+              />
             </div>
 
             <div className="hidden lg:block w-[360px] relative h-full overflow-hidden">
@@ -193,18 +238,32 @@ export default function EntryDetailPage() {
 
           <div className="mt-6 flex items-center gap-4 sm:gap-10 flex-shrink-0 flex-wrap">
             <button
-              onClick={() => router.push(`/entry/${id}/edit`)}
-              className="px-10 sm:px-16 py-4 sm:py-5 rounded-xl text-xl sm:text-3xl font-bold text-white transition"
+              onClick={handlePublish}
+              disabled={savingPublish || savingDraft || deleting}
+              className="px-10 sm:px-16 py-4 sm:py-5 rounded-xl text-xl sm:text-3xl font-bold text-white transition disabled:opacity-60"
               style={{ backgroundColor: COLORS.primary }}
               onMouseEnter={(e) => hoverPrimary(e, true)}
               onMouseLeave={(e) => hoverPrimary(e, false)}
             >
-              Edit
+              {savingPublish ? "Saving..." : "Save"}
+            </button>
+
+            <button
+              onClick={handleSaveAsDraft}
+              disabled={savingPublish || savingDraft || deleting}
+              className="px-10 sm:px-16 py-4 sm:py-5 rounded-xl text-xl sm:text-3xl font-bold border transition disabled:opacity-60"
+              style={{
+                backgroundColor: COLORS.softWhite,
+                borderColor: COLORS.border,
+                color: COLORS.text,
+              }}
+            >
+              {savingDraft ? "Saving..." : "Save as Draft"}
             </button>
 
             <button
               onClick={handleDelete}
-              disabled={deleting}
+              disabled={savingPublish || savingDraft || deleting}
               className="px-10 sm:px-16 py-4 sm:py-5 rounded-xl text-xl sm:text-3xl font-bold border transition disabled:opacity-60"
               style={{
                 backgroundColor: "rgba(255,255,255,0.55)",
