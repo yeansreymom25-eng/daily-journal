@@ -12,10 +12,13 @@ export default function LoginPage() {
 
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     setLoading(true);
+
+    setErrorMessage("");
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -25,7 +28,7 @@ export default function LoginPage() {
     setLoading(false);
 
     if (error) {
-      alert(error.message);
+      setErrorMessage(error.message);
       return;
     }
 
@@ -129,6 +132,12 @@ export default function LoginPage() {
                 <p className="text-center text-[#4f252a]/70 mb-6 text-base">
                   Please enter your login details below
                 </p>
+
+                {errorMessage && (
+                  <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm sm:text-base text-red-700">
+                    {errorMessage}
+                  </div>
+                )}
 
                 <form onSubmit={onSubmit} className="space-y-5">
                   <div>

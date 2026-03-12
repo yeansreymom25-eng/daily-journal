@@ -9,9 +9,11 @@ export default function ForgotPasswordPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setErrorMessage("");
     setLoading(true);
 
     const siteUrl =
@@ -24,11 +26,11 @@ export default function ForgotPasswordPage() {
     setLoading(false);
 
     if (error) {
-      alert(error.message);
+      setErrorMessage(error.message);
       return;
     }
 
-    router.push("/check-email");
+    router.push("/check-email?type=reset");
   }
 
   return (
@@ -110,6 +112,12 @@ export default function ForgotPasswordPage() {
                 <p className="text-center text-[#4f252a]/70 mb-6 text-base">
                   Enter your email and we’ll send a reset link
                 </p>
+
+                {errorMessage && (
+                  <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm sm:text-base text-red-700">
+                    {errorMessage}
+                  </div>
+                )}
 
                 <form onSubmit={onSubmit} className="space-y-5">
                   <div>

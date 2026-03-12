@@ -83,7 +83,7 @@ const handleDeleteDraft = async (id: string) => {
   async function handleLogout() {
     try {
       await signOutUser();
-      router.push("/login");
+      router.push("/");
     } catch (error: any) {
       alert(error.message || "Logout failed.");
     }
@@ -91,8 +91,29 @@ const handleDeleteDraft = async (id: string) => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center text-2xl font-bold" style={{ backgroundColor: COLORS.bg, color: COLORS.text }}>
-        Loading...
+      <div className="min-h-screen flex flex-col" style={{ backgroundColor: COLORS.bg }}>
+        <header className="w-full h-[72px] border-b shadow-md flex items-center justify-end px-8 gap-4" style={{ backgroundColor: COLORS.top, borderColor: "#3a1b1f" }}>
+          <div className="w-24 h-9 rounded-lg bg-white/20 animate-pulse" />
+          <div className="w-24 h-9 rounded-lg bg-white/20 animate-pulse" />
+          <div className="w-9 h-9 rounded-md bg-white/20 animate-pulse" />
+        </header>
+        <main className="flex-1 flex">
+          <aside className="hidden md:flex w-[300px] lg:w-[340px] border-r flex-col" style={{ backgroundColor: COLORS.side, borderColor: "rgba(79,37,42,0.3)" }}>
+            <div className="h-[220px] lg:h-[240px] border-b flex flex-col items-center justify-center p-6 gap-4" style={{ borderColor: "rgba(79,37,42,0.3)" }}>
+              <div className="w-[140px] lg:w-[150px] h-[140px] lg:h-[150px] rounded-full bg-black/5 animate-pulse" />
+              <div className="w-40 h-8 lg:h-10 rounded-lg bg-black/5 animate-pulse" />
+            </div>
+            <div className="p-5 lg:p-6 space-y-3">
+              <div className="w-full h-14 rounded-lg bg-black/5 animate-pulse" />
+              <div className="w-full h-14 rounded-lg bg-black/5 animate-pulse" />
+              <div className="w-full h-14 rounded-lg bg-black/5 animate-pulse" />
+            </div>
+          </aside>
+          <section className="flex-1 p-4 sm:p-6 md:p-10">
+            <div className="w-32 sm:w-48 md:w-64 h-12 md:h-16 rounded-xl bg-black/5 animate-pulse mb-6 sm:mb-8" />
+            <div className="w-full h-[400px] rounded-xl bg-white border animate-pulse" style={{ borderColor: "rgba(79,37,42,0.25)" }} />
+          </section>
+        </main>
       </div>
     );
   }

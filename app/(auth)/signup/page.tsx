@@ -26,6 +26,16 @@ export default function SignupPage() {
     setMessage("");
     setErrorMessage("");
 
+    if (password.length < 6) {
+      setErrorMessage("Password must be at least 6 characters long.");
+      return;
+    }
+
+    if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9])/.test(password)) {
+      setErrorMessage("Password must contain at least one uppercase letter, one lowercase letter, and one number.");
+      return;
+    }
+
     if (password !== confirmPassword) {
       setErrorMessage("Passwords do not match.");
       return;
@@ -56,7 +66,7 @@ export default function SignupPage() {
 
     if (!data.session) {
       setMessage("Account created successfully. Please check your email to confirm your account.");
-      router.push("/check-email");
+      router.push("/check-email?type=signup");
       return;
     }
 

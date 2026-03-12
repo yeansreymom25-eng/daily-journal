@@ -11,21 +11,35 @@ export default function ResetPasswordPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [ready, setReady] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
 
   useEffect(() => {
     const prepareRecovery = async () => {
-      await supabase.auth.getSession();
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error || !session) {
+        alert("Invalid or expired password reset link. Please try again.");
+        router.replace("/forgot-password");
+        return;
+      }
+      
       setReady(true);
     };
 
     prepareRecovery();
-  }, []);
+  }, [router]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
+    setErrorMessage("");
 
     if (password !== confirmPassword) {
-      alert("Passwords do not match.");
+      setErrorMessage("Passwords do not match.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setErrorMessage("Password must be at least 6 characters long.");
       return;
     }
 
@@ -38,7 +52,7 @@ export default function ResetPasswordPage() {
     setLoading(false);
 
     if (error) {
-      alert(error.message);
+      setErrorMessage(error.message);
       return;
     }
 
@@ -57,8 +71,14 @@ export default function ResetPasswordPage() {
           Enter your new password below.
         </p>
 
+        {errorMessage && (
+          <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm sm:text-base text-red-700">
+            {errorMessage}
+          </div>
+        )}
+
         {!ready ? (
-          <p className="text-center text-[#4f252a]">Loading...</p>
+          <p className="text-center text-[#4f252a]">Verifying session...</p>
         ) : (
           <form onSubmit={onSubmit} className="space-y-5">
             <div>
