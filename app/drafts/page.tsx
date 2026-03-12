@@ -62,7 +62,7 @@ export default function DraftsPage() {
         user_id: user.id,
         title: "Draft: New idea ✨",
         content: "",
-        mood: "📝",
+        mood: "",
       });
 
       router.push(`/drafts/${newDraft.id}`);

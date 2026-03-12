@@ -1,9 +1,14 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { getCurrentUser, signOutUser } from "@/lib/auth";
-import { deleteDraft, getDraftById, publishDraft, updateDraft } from "@/lib/journal";
+import {
+  deleteDraft,
+  getDraftById,
+  publishDraft,
+  updateDraft,
+} from "@/lib/journal";
 
 export default function DraftDetailPage() {
   const router = useRouter();
@@ -46,13 +51,13 @@ export default function DraftDetailPage() {
         const draft = await getDraftById(id);
         setTitle(draft.title || "Draft");
         setContent(draft.content || "");
-        setMood(draft.mood || "📝");
+        setMood(draft.mood || "");
         setCreatedAt(
           new Date(draft.created_at).toLocaleDateString("en-US", {
             year: "numeric",
             month: "long",
             day: "numeric",
-          })
+          }),
         );
       } catch (error: any) {
         setErrorMessage(error.message || "Failed to load draft.");
@@ -67,7 +72,19 @@ export default function DraftDetailPage() {
     }
   }, [id, router]);
 
-  const hoverPrimary = (e: React.MouseEvent<HTMLButtonElement>, on: boolean) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = "auto";
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+    }
+  }, [content]);
+
+  const hoverPrimary = (
+    e: React.MouseEvent<HTMLButtonElement>,
+    on: boolean,
+  ) => {
     e.currentTarget.style.backgroundColor = on
       ? COLORS.primaryHover
       : COLORS.primary;
@@ -154,10 +171,13 @@ export default function DraftDetailPage() {
 
   return (
     <div
-      className="min-h-screen md:h-screen flex flex-col overflow-hidden"
+      className="min-h-screen flex flex-col overflow-x-hidden"
       style={{ backgroundColor: COLORS.bg }}
     >
-      <header className="w-full flex-shrink-0" style={{ backgroundColor: COLORS.top }}>
+      <header
+        className="w-full flex-shrink-0"
+        style={{ backgroundColor: COLORS.top }}
+      >
         <div className="w-full px-4 sm:px-6 md:px-10 py-4 flex items-center justify-end">
           <button
             onClick={handleLogout}
@@ -171,8 +191,8 @@ export default function DraftDetailPage() {
         </div>
       </header>
 
-      <main className="flex-1 overflow-hidden px-4 sm:px-6 md:px-10 py-6">
-        <div className="mx-auto w-full max-w-6xl h-full flex flex-col">
+      <main className="flex-1 px-4 sm:px-6 md:px-10 py-6">
+        <div className="mx-auto w-full max-w-6xl flex flex-col flex-1">
           <div className="flex items-center justify-between flex-shrink-0">
             <div className="flex items-center gap-4 sm:gap-6 min-w-0">
               <button
@@ -183,20 +203,21 @@ export default function DraftDetailPage() {
                 ←
               </button>
 
-              <div className="min-w-0">
-                <div className="flex items-center gap-3 sm:gap-4">
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-3 sm:gap-4 flex-wrap">
                   <input
                     value={title}
                     onChange={(e) => setTitle(e.target.value)}
-                    className="bg-transparent outline-none text-4xl sm:text-5xl md:text-6xl font-extrabold"
+                    className="bg-transparent outline-none text-4xl sm:text-5xl md:text-6xl font-extrabold w-full"
                     style={{
                       color: COLORS.text,
-                      width: `${Math.max(title.length || 5, 5)}ch`,
-                      minWidth: "5ch",
-                      maxWidth: "420px",
                     }}
                   />
-                  <span className="text-4xl sm:text-5xl flex-shrink-0">{mood}</span>
+                  {mood && mood !== "📝" && (
+                    <span className="text-4xl sm:text-5xl flex-shrink-0">
+                      {mood}
+                    </span>
+                  )}
                 </div>
 
                 <div
@@ -215,9 +236,9 @@ export default function DraftDetailPage() {
             </div>
           )}
 
-          <div className="mt-6 flex-1 flex gap-6 lg:gap-10 items-start overflow-hidden flex-col lg:flex-row">
+          <div className="mt-6 flex-1 flex gap-6 lg:gap-10 items-start flex-col lg:flex-row">
             <div
-              className="flex-1 rounded-2xl border p-6 sm:p-10 h-full overflow-hidden w-full"
+              className="flex-1 rounded-2xl border p-6 sm:p-10 w-full min-w-0"
               style={{
                 backgroundColor: COLORS.card,
                 borderColor: COLORS.border,
@@ -225,21 +246,22 @@ export default function DraftDetailPage() {
               }}
             >
               <textarea
+                ref={textareaRef}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Start writing your draft..."
-                className="w-full h-full outline-none resize-none text-xl sm:text-2xl md:text-3xl leading-relaxed whitespace-pre-wrap"
+                className="w-full min-h-[300px] outline-none resize-none overflow-hidden text-xl sm:text-2xl md:text-3xl leading-relaxed whitespace-pre-wrap break-words"
                 style={{ backgroundColor: "transparent", color: COLORS.text }}
               />
             </div>
 
-            <div className="hidden lg:block w-[360px] relative h-full overflow-hidden">
+            <div className="hidden lg:block w-[360px] relative">
               <img
                 src="/images/coffee.png"
                 alt="Coffee"
                 className="w-[420px] h-auto select-none"
                 draggable={false}
-                style={{ marginLeft: "-60px", marginTop: "20px" }}
+                style={{ marginLeft: "-20px", marginTop: "20px" }}
               />
             </div>
           </div>
