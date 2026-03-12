@@ -1,8 +1,14 @@
 "use client";
 
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { Suspense } from "react";
 
-export default function CheckEmailPage() {
+function CheckEmailContent() {
+  const searchParams = useSearchParams();
+  const type = searchParams.get("type");
+  const isSignup = type === "signup";
+
   return (
     <div className="min-h-screen flex flex-col relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-br from-[#fbe3b9] via-[#edd0ac] to-[#fbe3b9]" />
@@ -47,9 +53,9 @@ export default function CheckEmailPage() {
             </h1>
 
             <p className="text-[#4f252a]/80 text-base leading-relaxed max-w-[460px] mx-auto mb-8">
-              We sent a password reset link.
+              We sent a {isSignup ? "confirmation" : "password reset"} link to your email.
               <br />
-              Open the email and click the link.
+              Open the email to {isSignup ? "activate your account" : "update your password"}.
               <br />
               If you don’t see it, check spam.
             </p>
@@ -78,5 +84,17 @@ export default function CheckEmailPage() {
         </div>
       </footer>
     </div>
+  );
+}
+
+export default function CheckEmailPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-[#fbe3b9] text-[#4f252a] font-bold text-xl">
+        Loading...
+      </div>
+    }>
+      <CheckEmailContent />
+    </Suspense>
   );
 }

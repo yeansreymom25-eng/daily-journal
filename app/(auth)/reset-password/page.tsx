@@ -20,12 +20,19 @@ export default function ResetPasswordPage() {
 
   useEffect(() => {
     const prepareRecovery = async () => {
-      await supabase.auth.getSession();
+      const { data: { session }, error } = await supabase.auth.getSession();
+      
+      if (error || !session) {
+        alert("Invalid or expired password reset link. Please try again.");
+        router.replace("/forgot-password");
+        return;
+      }
+      
       setReady(true);
     };
 
     prepareRecovery();
-  }, []);
+  }, [router]);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -47,6 +54,7 @@ export default function ResetPasswordPage() {
     setLoading(false);
 
     if (error) {
+      setErrorMessage(error.message);
       setErrorMessage(error.message);
       return;
     }

@@ -1,6 +1,13 @@
 @import "tailwindcss";
 
+:root {
+  --font-sans: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  --font-hand: "Comic Sans MS", "Bradley Hand", cursive;
+}
+
+html,
 body {
   margin: 0;
   padding: 0;
+  font-family: var(--font-sans);
 }

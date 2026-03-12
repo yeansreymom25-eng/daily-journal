@@ -1,17 +1,5 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { Patrick_Hand, Inter } from "next/font/google";
-
-const handwriting = Patrick_Hand({
-  subsets: ["latin"],
-  weight: ["400"],
-  variable: "--font-hand",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  variable: "--font-sans",
-});
 
 export const metadata: Metadata = {
   title: "Daily Journal",
@@ -24,7 +12,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${handwriting.variable} ${inter.variable}`}>
+    <html lang="en">
       <body>{children}</body>
     </html>
   );
