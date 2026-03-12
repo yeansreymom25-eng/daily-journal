@@ -42,7 +42,7 @@ export default function EntryDetailPage() {
         const entry = await getEntryById(id);
 
         setTitle(entry.title || "Untitled Entry");
-        setMood(entry.mood || "📝");
+        setMood(entry.mood || "");
         setContent(entry.content || "");
         setDate(
           new Date(entry.created_at).toLocaleDateString("en-US", {

@@ -46,7 +46,7 @@ export default function DraftDetailPage() {
         const draft = await getDraftById(id);
         setTitle(draft.title || "Draft");
         setContent(draft.content || "");
-        setMood(draft.mood || "📝");
+        setMood(draft.mood || "");
         setCreatedAt(
           new Date(draft.created_at).toLocaleDateString("en-US", {
             year: "numeric",
@@ -184,21 +184,15 @@ export default function DraftDetailPage() {
               </button>
 
               <div className="min-w-0">
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <input
-                    value={title}
-                    onChange={(e) => setTitle(e.target.value)}
-                    className="bg-transparent outline-none text-4xl sm:text-5xl md:text-6xl font-extrabold"
-                    style={{
-                      color: COLORS.text,
-                      width: `${Math.max(title.length || 5, 5)}ch`,
-                      minWidth: "5ch",
-                      maxWidth: "420px",
-                    }}
-                  />
-                  <span className="text-4xl sm:text-5xl flex-shrink-0">{mood}</span>
+                        <div className="flex items-center gap-3 sm:gap-4">
+                  <h1
+                    className="text-4xl sm:text-5xl md:text-6xl font-extrabold truncate"
+                    style={{ color: COLORS.text }}
+                  >
+                    {title}
+                  </h1>
+                  <span className="text-4xl sm:text-5xl">{mood}</span>
                 </div>
-
                 <div
                   className="mt-2 text-xl sm:text-2xl md:text-3xl"
                   style={{ color: "rgba(79,37,42,0.55)" }}
