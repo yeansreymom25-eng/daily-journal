@@ -3,8 +3,14 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
+import { Camera, UserCircle2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
-import { getCurrentUser, getDisplayName, signOutUser } from "@/lib/auth";
+import { getAvatarUrl, getCurrentUser, getDisplayName, signOutUser } from "@/lib/auth";
+
+function getErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof Error && error.message) return error.message;
+  return fallback;
+}
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -21,6 +27,7 @@ export default function SettingsPage() {
   const [user, setUser] = useState<User | null>(null);
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -45,6 +52,7 @@ export default function SettingsPage() {
       setUser(currentUser);
       setDisplayName(getDisplayName(currentUser));
       setEmail(currentUser.email ?? "");
+      setAvatarUrl(getAvatarUrl(currentUser));
       setLoading(false);
     };
 
@@ -55,8 +63,8 @@ export default function SettingsPage() {
     try {
       await signOutUser();
       router.push("/login");
-    } catch (error: any) {
-      setErrorMessage(error.message || "Logout failed.");
+    } catch (error: unknown) {
+      setErrorMessage(getErrorMessage(error, "Logout failed."));
     }
   }
 
@@ -67,11 +75,12 @@ export default function SettingsPage() {
 
     try {
       const payload: {
-        data?: { full_name: string };
+        data?: { full_name: string; avatar_url: string };
         email?: string;
       } = {
         data: {
           full_name: displayName,
+          avatar_url: avatarUrl.trim(),
         },
       };
 
@@ -85,13 +94,27 @@ export default function SettingsPage() {
         throw error;
       }
 
+      setUser((prev) => {
+        if (!prev) return prev;
+
+        return {
+          ...prev,
+          email,
+          user_metadata: {
+            ...prev.user_metadata,
+            full_name: displayName,
+            avatar_url: avatarUrl.trim(),
+          },
+        };
+      });
+
       setSuccessMessage(
         user?.email !== email
           ? "Profile updated. Check your email to confirm the new email address."
           : "Profile updated successfully."
       );
-    } catch (error: any) {
-      setErrorMessage(error.message || "Failed to save changes.");
+    } catch (error: unknown) {
+      setErrorMessage(getErrorMessage(error, "Failed to save changes."));
     } finally {
       setSaving(false);
     }
@@ -126,8 +149,8 @@ export default function SettingsPage() {
       setShowPasswordModal(false);
       setNewPassword("");
       setSuccessMessage("Password updated successfully.");
-    } catch (error: any) {
-      setErrorMessage(error.message || "Failed to change password.");
+    } catch (error: unknown) {
+      setErrorMessage(getErrorMessage(error, "Failed to change password."));
     } finally {
       setChangingPassword(false);
     }
@@ -153,8 +176,8 @@ export default function SettingsPage() {
 
       await supabase.auth.signOut();
       router.push("/signup");
-    } catch (error: any) {
-      setErrorMessage(error.message || "Failed to delete account.");
+    } catch (error: unknown) {
+      setErrorMessage(getErrorMessage(error, "Failed to delete account."));
       setDeletingAccount(false);
       setShowDeleteModal(false);
     }
@@ -238,6 +261,27 @@ export default function SettingsPage() {
             </div>
           )}
 
+          <div className="mb-8 flex flex-col items-center">
+            <div
+              className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-4"
+              style={{ borderColor: "rgba(241,116,94,0.25)", backgroundColor: "#fbf3b9" }}
+            >
+              {avatarUrl.trim() ? (
+                <img
+                  src={avatarUrl}
+                  alt="Profile preview"
+                  className="h-full w-full object-cover"
+                />
+              ) : (
+                <UserCircle2 size={72} color={COLORS.text} />
+              )}
+            </div>
+            <div className="mt-4 flex items-center gap-2 text-sm font-semibold" style={{ color: COLORS.text }}>
+              <Camera size={16} />
+              Profile photo preview
+            </div>
+          </div>
+
           <div className="mb-6">
             <label className="block mb-2 font-semibold text-gray-800">
               Display Name
@@ -260,6 +304,22 @@ export default function SettingsPage() {
               onChange={(e) => setEmail(e.target.value)}
               className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f1745e]"
             />
+          </div>
+
+          <div className="mb-8">
+            <label className="block mb-2 font-semibold text-gray-800">
+              Profile Picture URL
+            </label>
+            <input
+              type="url"
+              value={avatarUrl}
+              onChange={(e) => setAvatarUrl(e.target.value)}
+              placeholder="https://example.com/your-photo.jpg"
+              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f1745e]"
+            />
+            <p className="mt-2 text-sm text-gray-500">
+              Paste an image link to show your photo on the dashboard.
+            </p>
           </div>
 
           <div className="flex flex-col sm:flex-row justify-center gap-4">

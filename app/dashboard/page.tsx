@@ -14,7 +14,7 @@ import {
   Trash2,
   UserCircle2,
 } from "lucide-react";
-import { getCurrentUser, signOutUser } from "@/lib/auth";
+import { getAvatarUrl, getCurrentUser, signOutUser } from "@/lib/auth";
 import { getDrafts, getEntries, type JournalDraft, type JournalEntry } from "@/lib/journal";
 
 type Tab = "recent" | "drafts";
@@ -89,6 +89,8 @@ export default function DashboardPage() {
     if (tab === "recent") return entries;
     return drafts;
   }, [tab, entries, drafts]);
+
+  const avatarUrl = useMemo(() => getAvatarUrl(user), [user]);
 
   const stats = useMemo(() => {
     const publishedThisMonth = entries.filter((entry) => {
@@ -242,10 +244,14 @@ export default function DashboardPage() {
           >
             <div className="flex items-center gap-4">
               <div
-                className="flex h-16 w-16 items-center justify-center rounded-2xl"
+                className="flex h-16 w-16 items-center justify-center overflow-hidden rounded-2xl"
                 style={{ backgroundColor: COLORS.top }}
               >
-                <BookOpen size={28} color="#fff" />
+                {avatarUrl ? (
+                  <img src={avatarUrl} alt="Profile" className="h-full w-full object-cover" />
+                ) : (
+                  <BookOpen size={28} color="#fff" />
+                )}
               </div>
               <div>
                 <p className="text-sm font-semibold uppercase tracking-[0.25em]" style={{ color: COLORS.textSoft }}>
@@ -313,11 +319,11 @@ export default function DashboardPage() {
                   Overview
                 </p>
                 <h2 className="mt-2 text-4xl font-black leading-tight lg:text-5xl">
-                  A softer, cleaner dashboard without changing your app logic.
+                  A thoughtful space to reflect, preserve meaningful moments, and write with clarity.
                 </h2>
                 <p className="mt-4 max-w-xl text-base leading-7" style={{ color: COLORS.textSoft }}>
-                  Your backend calls, routes, and journal actions are unchanged. This update only reshapes
-                  the dashboard presentation.
+                  Designed to help you capture daily experiences with intention, revisit your personal
+                  story, and keep every entry or draft organized with ease.
                 </p>
               </div>
 

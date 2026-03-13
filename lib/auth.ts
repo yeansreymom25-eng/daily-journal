@@ -28,3 +28,10 @@ export function getDisplayName(user: User | null) {
 
   return user.email ?? "My Journal User";
 }
+
+export function getAvatarUrl(user: User | null) {
+  if (!user) return "";
+
+  const avatarUrl = user.user_metadata?.avatar_url;
+  return typeof avatarUrl === "string" ? avatarUrl.trim() : "";
+}
