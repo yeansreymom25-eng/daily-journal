@@ -201,7 +201,7 @@ export default function DashboardPage() {
         <div className="relative mx-auto flex max-w-[1440px] items-center justify-between gap-4">
           <div>
             <p className="text-sm uppercase tracking-[0.35em] text-white/60">Daily Journal</p>
-            <h1 className="mt-1 text-2xl font-black text-white">Your writing dashboard</h1>
+            <h1 className="mt-1 text-2xl font-black text-white">A home for your reflections</h1>
           </div>
 
           <div className="flex items-center gap-3">

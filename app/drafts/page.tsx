@@ -3,8 +3,22 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
-import { getCurrentUser, signOutUser } from "@/lib/auth";
+import {
+  BookOpen,
+  FileText,
+  LayoutDashboard,
+  PencilLine,
+  Settings,
+  Trash2,
+  UserCircle2,
+} from "lucide-react";
+import { getAvatarUrl, getCurrentUser, signOutUser } from "@/lib/auth";
 import { createDraft, deleteDraft, getDrafts, type JournalDraft } from "@/lib/journal";
+
+function getErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof Error && error.message) return error.message;
+  return fallback;
+}
 
 export default function DraftsPage() {
   const router = useRouter();
@@ -38,8 +52,8 @@ export default function DraftsPage() {
       try {
         const data = await getDrafts();
         setDrafts(data);
-      } catch (error: any) {
-        alert(error.message || "Failed to load drafts.");
+      } catch (error: unknown) {
+        alert(getErrorMessage(error, "Failed to load drafts."));
       } finally {
         setLoading(false);
       }
@@ -49,9 +63,7 @@ export default function DraftsPage() {
   }, [router]);
 
   const hoverPrimary = (e: React.MouseEvent<HTMLButtonElement>, on: boolean) => {
-    e.currentTarget.style.backgroundColor = on
-      ? COLORS.primaryHover
-      : COLORS.primary;
+    e.currentTarget.style.backgroundColor = on ? COLORS.primaryHover : COLORS.primary;
   };
 
   const createNewDraft = async () => {
@@ -60,46 +72,57 @@ export default function DraftsPage() {
     try {
       const newDraft = await createDraft({
         user_id: user.id,
-        title: "Draft: New idea ✨",
+        title: "Draft: New idea",
         content: "",
         mood: "",
       });
 
       router.push(`/drafts/${newDraft.id}`);
-    } catch (error: any) {
-      alert(error.message || "Failed to create draft.");
+    } catch (error: unknown) {
+      alert(getErrorMessage(error, "Failed to create draft."));
     }
   };
 
-const handleDeleteDraft = async (id: string) => {
-  try {
-    await deleteDraft(id);
-    setDrafts((prev) => prev.filter((draft) => draft.id !== id));
-  } catch (error: any) {
-    console.error(error);
-  }
-};
+  const handleDeleteDraft = async (id: string) => {
+    try {
+      await deleteDraft(id);
+      setDrafts((prev) => prev.filter((draft) => draft.id !== id));
+    } catch (error: unknown) {
+      console.error(error);
+    }
+  };
 
   async function handleLogout() {
     try {
       await signOutUser();
       router.push("/");
-    } catch (error: any) {
-      alert(error.message || "Logout failed.");
+    } catch (error: unknown) {
+      alert(getErrorMessage(error, "Logout failed."));
     }
   }
+
+  const avatarUrl = getAvatarUrl(user);
 
   if (loading) {
     return (
       <div className="min-h-screen flex flex-col" style={{ backgroundColor: COLORS.bg }}>
-        <header className="w-full h-[72px] border-b shadow-md flex items-center justify-end px-8 gap-4" style={{ backgroundColor: COLORS.top, borderColor: "#3a1b1f" }}>
+        <header
+          className="w-full h-[72px] border-b shadow-md flex items-center justify-end px-8 gap-4"
+          style={{ backgroundColor: COLORS.top, borderColor: "#3a1b1f" }}
+        >
           <div className="w-24 h-9 rounded-lg bg-white/20 animate-pulse" />
           <div className="w-24 h-9 rounded-lg bg-white/20 animate-pulse" />
           <div className="w-9 h-9 rounded-md bg-white/20 animate-pulse" />
         </header>
         <main className="flex-1 flex">
-          <aside className="hidden md:flex w-[300px] lg:w-[340px] border-r flex-col" style={{ backgroundColor: COLORS.side, borderColor: "rgba(79,37,42,0.3)" }}>
-            <div className="h-[220px] lg:h-[240px] border-b flex flex-col items-center justify-center p-6 gap-4" style={{ borderColor: "rgba(79,37,42,0.3)" }}>
+          <aside
+            className="hidden md:flex w-[300px] lg:w-[340px] border-r flex-col"
+            style={{ backgroundColor: COLORS.side, borderColor: "rgba(79,37,42,0.3)" }}
+          >
+            <div
+              className="h-[220px] lg:h-[240px] border-b flex flex-col items-center justify-center p-6 gap-4"
+              style={{ borderColor: "rgba(79,37,42,0.3)" }}
+            >
               <div className="w-[140px] lg:w-[150px] h-[140px] lg:h-[150px] rounded-full bg-black/5 animate-pulse" />
               <div className="w-40 h-8 lg:h-10 rounded-lg bg-black/5 animate-pulse" />
             </div>
@@ -111,7 +134,10 @@ const handleDeleteDraft = async (id: string) => {
           </aside>
           <section className="flex-1 p-4 sm:p-6 md:p-10">
             <div className="w-32 sm:w-48 md:w-64 h-12 md:h-16 rounded-xl bg-black/5 animate-pulse mb-6 sm:mb-8" />
-            <div className="w-full h-[400px] rounded-xl bg-white border animate-pulse" style={{ borderColor: "rgba(79,37,42,0.25)" }} />
+            <div
+              className="w-full h-[400px] rounded-xl bg-white border animate-pulse"
+              style={{ borderColor: "rgba(79,37,42,0.25)" }}
+            />
           </section>
         </main>
       </div>
@@ -157,7 +183,7 @@ const handleDeleteDraft = async (id: string) => {
             onClick={() => router.push("/settings")}
             title={user?.email ?? "Profile"}
           >
-            👤
+            <UserCircle2 size={18} />
           </button>
         </div>
       </header>
@@ -174,7 +200,16 @@ const handleDeleteDraft = async (id: string) => {
             className="h-[220px] lg:h-[240px] border-b flex flex-col items-center justify-center gap-4"
             style={{ borderColor: "rgba(79,37,42,0.3)" }}
           >
-            <img src="/images/journal.png" alt="My Journal" className="w-[140px] lg:w-[150px]" />
+            <div
+              className="flex h-24 w-24 items-center justify-center overflow-hidden rounded-[28px]"
+              style={{ backgroundColor: COLORS.top }}
+            >
+              {avatarUrl ? (
+                <img src={avatarUrl} alt="Profile" className="h-full w-full object-cover" />
+              ) : (
+                <BookOpen size={40} color="#fff" />
+              )}
+            </div>
             <div className="text-3xl lg:text-4xl font-extrabold" style={{ color: COLORS.text }}>
               My Journal
             </div>
@@ -192,7 +227,7 @@ const handleDeleteDraft = async (id: string) => {
                 e.currentTarget.style.backgroundColor = "transparent";
               }}
             >
-              <img src="/images/dashboard.png" alt="Dashboard" className="w-7" />
+              <LayoutDashboard size={22} />
               Dashboard
             </button>
 
@@ -200,7 +235,7 @@ const handleDeleteDraft = async (id: string) => {
               className="w-full flex items-center gap-4 px-5 py-4 rounded-lg text-white font-bold"
               style={{ backgroundColor: COLORS.primary }}
             >
-              <img src="/images/drafts.png" alt="Drafts" className="w-7" />
+              <FileText size={22} />
               Drafts
             </button>
 
@@ -215,14 +250,18 @@ const handleDeleteDraft = async (id: string) => {
                 e.currentTarget.style.backgroundColor = "transparent";
               }}
             >
-              ⚙️ Setting
+              <Settings size={22} />
+              Settings
             </button>
           </div>
         </aside>
 
         <section className="flex-1 p-4 sm:p-6 md:p-10">
           <div className="flex items-center justify-between gap-3">
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold" style={{ color: COLORS.text }}>
+            <h1
+              className="text-4xl sm:text-5xl md:text-6xl font-extrabold"
+              style={{ color: COLORS.text }}
+            >
               Drafts
             </h1>
 
@@ -250,10 +289,10 @@ const handleDeleteDraft = async (id: string) => {
                 No drafts yet.
               </div>
             ) : (
-              drafts.map((d) => (
+              drafts.map((draft) => (
                 <div
-                  key={d.id}
-                  onClick={() => router.push(`/drafts/${d.id}`)}
+                  key={draft.id}
+                  onClick={() => router.push(`/drafts/${draft.id}`)}
                   className="cursor-pointer px-4 sm:px-6 md:px-8 py-5 sm:py-6 border-b flex items-center justify-between transition"
                   style={{ borderColor: "rgba(79,37,42,0.10)" }}
                   onMouseEnter={(ev) => {
@@ -265,30 +304,32 @@ const handleDeleteDraft = async (id: string) => {
                 >
                   <div className="min-w-0">
                     <div className="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#1b1b1b] truncate">
-                      {d.title || "Untitled Draft"}{" "}
-                      <span className="text-lg sm:text-xl md:text-2xl">{d.mood}</span>
+                      {draft.title || "Untitled Draft"}{" "}
+                      <span className="text-lg sm:text-xl md:text-2xl">{draft.mood}</span>
                     </div>
                     <div className="text-gray-600 text-sm sm:text-base md:text-lg mt-1 truncate">
-                      {d.content ? d.content.slice(0, 90) : "Start writing your draft..."}
+                      {draft.content ? draft.content.slice(0, 90) : "Start writing your draft..."}
                     </div>
                   </div>
 
-                  <div className="flex gap-4 sm:gap-5 text-xl sm:text-2xl opacity-80 flex-shrink-0">
+                  <div className="flex gap-4 sm:gap-5 opacity-80 flex-shrink-0">
                     <button
                       onClick={(ev) => {
                         ev.stopPropagation();
-                        router.push(`/drafts/${d.id}`);
+                        router.push(`/drafts/${draft.id}`);
                       }}
+                      title="Edit draft"
                     >
-                      ✏️
+                      <PencilLine size={20} />
                     </button>
                     <button
                       onClick={(ev) => {
                         ev.stopPropagation();
-                        handleDeleteDraft(d.id);
+                        handleDeleteDraft(draft.id);
                       }}
+                      title="Delete draft"
                     >
-                      🗑️
+                      <Trash2 size={20} />
                     </button>
                   </div>
                 </div>
