@@ -2,8 +2,14 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { ArrowLeft, LogOut } from "lucide-react";
 import { deleteEntry, getEntryById } from "@/lib/journal";
 import { getCurrentUser, signOutUser } from "@/lib/auth";
+
+function getErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof Error && error.message) return error.message;
+  return fallback;
+}
 
 export default function EntryDetailPage() {
   const router = useRouter();
@@ -11,14 +17,14 @@ export default function EntryDetailPage() {
   const id = String(params?.id || "");
 
   const COLORS = {
-    bg: "#edd0ac",
     top: "#4f252a",
-    side: "#fbf3b9",
-    text: "#4f252a",
     primary: "#f1745e",
-    primaryHover: "#e06464",
-    border: "rgba(79,37,42,0.22)",
-    card: "rgba(255,255,255,0.65)",
+    primaryHover: "#df624f",
+    text: "#4f252a",
+    textSoft: "#7d5953",
+    panel: "#fffaf4",
+    panelSoft: "rgba(255,250,244,0.78)",
+    border: "rgba(79,37,42,0.14)",
   };
 
   const [title, setTitle] = useState("");
@@ -51,8 +57,8 @@ export default function EntryDetailPage() {
             day: "numeric",
           })
         );
-      } catch (error: any) {
-        setErrorMessage(error.message || "Failed to load entry.");
+      } catch (error: unknown) {
+        setErrorMessage(getErrorMessage(error, "Failed to load entry."));
       } finally {
         setLoading(false);
       }
@@ -66,16 +72,12 @@ export default function EntryDetailPage() {
     }
   }, [id, router]);
 
-  const hoverPrimary = (e: React.MouseEvent<HTMLButtonElement>, on: boolean) => {
-    e.currentTarget.style.backgroundColor = on ? COLORS.primaryHover : COLORS.primary;
-  };
-
   async function handleLogout() {
     try {
       await signOutUser();
       router.push("/login");
-    } catch (error: any) {
-      setErrorMessage(error.message || "Logout failed.");
+    } catch (error: unknown) {
+      setErrorMessage(getErrorMessage(error, "Logout failed."));
     }
   }
 
@@ -88,8 +90,8 @@ export default function EntryDetailPage() {
     try {
       await deleteEntry(id);
       router.push("/dashboard");
-    } catch (error: any) {
-      setErrorMessage(error.message || "Failed to delete entry.");
+    } catch (error: unknown) {
+      setErrorMessage(getErrorMessage(error, "Failed to delete entry."));
       setDeleting(false);
     }
   }
@@ -98,7 +100,10 @@ export default function EntryDetailPage() {
     return (
       <div
         className="min-h-screen flex items-center justify-center text-2xl font-bold"
-        style={{ backgroundColor: COLORS.bg, color: COLORS.text }}
+        style={{
+          background: "linear-gradient(180deg, #f7e8d0 0%, #ecd3b2 55%, #e5c5a0 100%)",
+          color: COLORS.text,
+        }}
       >
         Loading...
       </div>
@@ -107,97 +112,90 @@ export default function EntryDetailPage() {
 
   return (
     <div
-      className="min-h-screen md:h-screen flex flex-col overflow-hidden"
-      style={{ backgroundColor: COLORS.bg }}
+      className="min-h-screen flex flex-col"
+      style={{
+        background: "linear-gradient(180deg, #f7e8d0 0%, #ecd3b2 55%, #e5c5a0 100%)",
+      }}
     >
-      <header className="w-full flex-shrink-0" style={{ backgroundColor: COLORS.top }}>
-        <div className="w-full px-4 sm:px-6 md:px-10 py-4 flex items-center justify-end">
+      <header
+        className="w-full border-b shadow-sm"
+        style={{ backgroundColor: COLORS.top, borderColor: "rgba(255,255,255,0.08)" }}
+      >
+        <div className="mx-auto flex max-w-[1440px] items-center justify-end px-6 py-4 lg:px-10">
           <button
             onClick={handleLogout}
-            className="text-white font-bold px-5 py-2 rounded-lg transition"
+            className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white transition"
             style={{ backgroundColor: COLORS.primary }}
-            onMouseEnter={(e) => hoverPrimary(e, true)}
-            onMouseLeave={(e) => hoverPrimary(e, false)}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = COLORS.primaryHover;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = COLORS.primary;
+            }}
           >
+            <LogOut size={18} />
             Log Out
           </button>
         </div>
       </header>
 
-      <main className="flex-1 overflow-hidden px-4 sm:px-6 md:px-10 py-6">
-        <div className="mx-auto w-full max-w-6xl h-full flex flex-col">
-          <div className="flex items-center justify-between flex-shrink-0">
-            <div className="flex items-center gap-4 sm:gap-6 min-w-0">
-              <button
-                onClick={() => router.push("/dashboard")}
-                className="text-5xl sm:text-6xl font-bold leading-none"
-                style={{ color: COLORS.text }}
-              >
-                ←
-              </button>
+      <main className="mx-auto flex w-full max-w-[1440px] flex-1 px-6 py-8 lg:px-10">
+        <div className="w-full">
+          <button
+            onClick={() => router.push("/dashboard")}
+            className="mb-5 inline-flex items-center gap-2 text-lg font-black transition hover:opacity-75"
+            style={{ color: COLORS.text }}
+          >
+            <ArrowLeft size={20} />
+            Back
+          </button>
 
-              <div className="min-w-0">
-                <div className="flex items-center gap-3 sm:gap-4">
-                  <h1
-                    className="text-4xl sm:text-5xl md:text-6xl font-extrabold truncate"
-                    style={{ color: COLORS.text }}
-                  >
-                    {title}
-                  </h1>
-                  <span className="text-4xl sm:text-5xl">{mood}</span>
-                </div>
-
-                <div
-                  className="mt-2 text-xl sm:text-2xl md:text-3xl"
-                  style={{ color: "rgba(79,37,42,0.55)" }}
-                >
-                  {date}
-                </div>
+          <div
+            className="rounded-[36px] border shadow-[0_28px_70px_rgba(79,37,42,0.10)]"
+            style={{ backgroundColor: COLORS.panel, borderColor: COLORS.border }}
+          >
+            <div
+              className="border-b px-6 py-5 sm:px-8"
+              style={{ backgroundColor: COLORS.panelSoft, borderColor: COLORS.border }}
+            >
+              <div className="flex flex-wrap items-center gap-3">
+                <h1 className="text-3xl font-black sm:text-5xl" style={{ color: COLORS.text }}>
+                  {title}
+                </h1>
+                {mood && <span className="text-4xl">{mood}</span>}
+              </div>
+              <div className="mt-3 text-sm font-semibold uppercase tracking-[0.2em]" style={{ color: COLORS.textSoft }}>
+                {date}
               </div>
             </div>
-          </div>
 
-          {errorMessage && (
-            <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
-              {errorMessage}
-            </div>
-          )}
+            <div className="px-6 py-6 sm:px-8">
+              {errorMessage && (
+                <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+                  {errorMessage}
+                </div>
+              )}
 
-          <div className="mt-6 flex-1 flex gap-6 lg:gap-10 items-start overflow-hidden flex-col lg:flex-row">
-            <div
-              className="flex-1 rounded-2xl border p-6 sm:p-10 h-full overflow-hidden w-full"
-              style={{
-                backgroundColor: COLORS.card,
-                borderColor: COLORS.border,
-                boxShadow: "0 18px 35px rgba(79,37,42,0.18)",
-              }}
-            >
               <p
-                className="text-xl sm:text-2xl md:text-3xl leading-relaxed whitespace-pre-wrap"
+                className="min-h-[320px] whitespace-pre-wrap text-lg leading-8 sm:min-h-[420px]"
                 style={{ color: COLORS.text }}
               >
                 {content}
               </p>
             </div>
-
-            <div className="hidden lg:block w-[360px] relative h-full overflow-hidden">
-              <img
-                src="/images/coffee.png"
-                alt="Coffee"
-                className="w-[420px] h-auto select-none"
-                draggable={false}
-                style={{ marginLeft: "-60px", marginTop: "20px" }}
-              />
-            </div>
           </div>
 
-          <div className="mt-6 flex items-center gap-4 sm:gap-10 flex-shrink-0 flex-wrap">
+          <div className="mt-6 flex flex-wrap gap-5">
             <button
               onClick={() => router.push(`/entry/${id}/edit`)}
-              className="px-10 sm:px-16 py-4 sm:py-5 rounded-xl text-xl sm:text-3xl font-bold text-white transition"
+              className="rounded-full px-12 py-4 text-lg font-black text-white shadow-md transition"
               style={{ backgroundColor: COLORS.primary }}
-              onMouseEnter={(e) => hoverPrimary(e, true)}
-              onMouseLeave={(e) => hoverPrimary(e, false)}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = COLORS.primaryHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = COLORS.primary;
+              }}
             >
               Edit
             </button>
@@ -205,9 +203,9 @@ export default function EntryDetailPage() {
             <button
               onClick={handleDelete}
               disabled={deleting}
-              className="px-10 sm:px-16 py-4 sm:py-5 rounded-xl text-xl sm:text-3xl font-bold border transition disabled:opacity-60"
+              className="rounded-full border px-12 py-4 text-lg font-black transition disabled:opacity-60"
               style={{
-                backgroundColor: "rgba(255,255,255,0.55)",
+                backgroundColor: COLORS.panelSoft,
                 borderColor: COLORS.border,
                 color: "#cc1f1f",
               }}

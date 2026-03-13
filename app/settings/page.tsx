@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
-import { Camera, UserCircle2 } from "lucide-react";
+import { ArrowLeft, Camera, LogOut, UserCircle2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { getAvatarUrl, getCurrentUser, getDisplayName, signOutUser } from "@/lib/auth";
 import { PROFILE_BUCKET, uploadProfileImage } from "@/lib/profile";
@@ -17,12 +17,15 @@ export default function SettingsPage() {
   const router = useRouter();
 
   const COLORS = {
-    bg: "#edd0ac",
     top: "#4f252a",
     primary: "#f1745e",
-    primaryHover: "#e06464",
-    side: "#fbf3b9",
+    primaryHover: "#df624f",
+    side: "#f9efbc",
     text: "#4f252a",
+    textSoft: "#7d5953",
+    panel: "#fffaf4",
+    panelSoft: "rgba(255,250,244,0.78)",
+    border: "rgba(79,37,42,0.14)",
   };
 
   const [user, setUser] = useState<User | null>(null);
@@ -92,9 +95,7 @@ export default function SettingsPage() {
 
       const { error } = await supabase.auth.updateUser(payload);
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       setUser((prev) => {
         if (!prev) return prev;
@@ -140,9 +141,7 @@ export default function SettingsPage() {
         },
       });
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       setAvatarUrl(uploadedAvatarUrl);
       setUser((prev) => {
@@ -193,9 +192,7 @@ export default function SettingsPage() {
         password: newPassword,
       });
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       setShowPasswordModal(false);
       setNewPassword("");
@@ -221,9 +218,7 @@ export default function SettingsPage() {
     try {
       const { error } = await supabase.rpc("delete_current_user");
 
-      if (error) {
-        throw error;
-      }
+      if (error) throw error;
 
       await supabase.auth.signOut();
       router.push("/signup");
@@ -236,43 +231,40 @@ export default function SettingsPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex flex-col" style={{ backgroundColor: COLORS.bg }}>
-        <header className="w-full h-[72px] border-b shadow-md flex items-center justify-end px-8 gap-4" style={{ backgroundColor: COLORS.top, borderColor: "#3a1b1f" }}>
-          <div className="w-24 h-9 rounded-lg bg-white/20 animate-pulse" />
-          <div className="w-24 h-9 rounded-lg bg-white/20 animate-pulse" />
-          <div className="w-9 h-9 rounded-md bg-white/20 animate-pulse" />
-        </header>
-        <main className="flex-1 flex">
-          <aside className="w-[340px] border-r" style={{ backgroundColor: COLORS.side, borderColor: "rgba(79,37,42,0.3)" }}>
-            <div className="h-[240px] border-b flex flex-col items-center justify-center p-6 gap-4" style={{ borderColor: "rgba(79,37,42,0.3)" }}>
-              <div className="w-[150px] h-[150px] rounded-full bg-black/5 animate-pulse" />
-              <div className="w-40 h-8 rounded-lg bg-black/5 animate-pulse" />
-            </div>
-            <div className="p-6 space-y-3">
-              <div className="w-full h-14 rounded-lg bg-black/5 animate-pulse" />
-              <div className="w-full h-14 rounded-lg bg-black/5 animate-pulse" />
-              <div className="w-full h-14 rounded-lg bg-black/5 animate-pulse" />
-            </div>
-          </aside>
-          <section className="flex-1 p-10">
-            <div className="w-64 h-16 rounded-xl bg-black/5 animate-pulse mb-8" />
-            <div className="w-full h-[400px] rounded-xl bg-white border animate-pulse" style={{ borderColor: "rgba(79,37,42,0.25)" }} />
-          </section>
-        </main>
+      <div
+        className="min-h-screen flex items-center justify-center text-2xl font-bold"
+        style={{
+          background: "linear-gradient(180deg, #f7e8d0 0%, #ecd3b2 55%, #e5c5a0 100%)",
+          color: COLORS.text,
+        }}
+      >
+        Loading...
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex flex-col relative" style={{ backgroundColor: COLORS.bg }}>
-      <header className="w-full border-b shadow-md" style={{ backgroundColor: COLORS.top }}>
-        <div className="w-full px-4 sm:px-6 md:px-8 py-4 flex items-center justify-between">
-          <button onClick={() => router.back()} className="text-white text-base sm:text-lg font-semibold">
-            ← Back
+    <div
+      className="min-h-screen flex flex-col"
+      style={{
+        background: "linear-gradient(180deg, #f7e8d0 0%, #ecd3b2 55%, #e5c5a0 100%)",
+      }}
+    >
+      <header
+        className="w-full border-b shadow-sm"
+        style={{ backgroundColor: COLORS.top, borderColor: "rgba(255,255,255,0.08)" }}
+      >
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between px-4 py-4 sm:px-6 md:px-8 lg:px-10">
+          <button
+            onClick={() => router.back()}
+            className="inline-flex items-center gap-2 text-base font-semibold text-white sm:text-lg"
+          >
+            <ArrowLeft size={18} />
+            Back
           </button>
 
           <button
-            className="px-4 sm:px-5 py-2 rounded-lg text-white font-bold text-sm sm:text-base"
+            className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white transition"
             style={{ backgroundColor: COLORS.primary }}
             onMouseEnter={(e) => {
               e.currentTarget.style.backgroundColor = COLORS.primaryHover;
@@ -282,153 +274,155 @@ export default function SettingsPage() {
             }}
             onClick={handleLogout}
           >
+            <LogOut size={18} />
             Log Out
           </button>
         </div>
       </header>
 
-      <main className="flex-1 flex flex-col items-center justify-center px-4 sm:px-6">
-        <h1
-          className="text-4xl sm:text-5xl md:text-6xl font-extrabold mb-8 sm:mb-10 text-center"
-          style={{ color: COLORS.text }}
-        >
-          Settings
-        </h1>
-
-        <div className="bg-white rounded-2xl shadow-lg border p-6 sm:p-10 w-full max-w-2xl">
-          <p className="text-gray-600 mb-8 text-center text-sm sm:text-base">
-            Manage your account preferences.
-          </p>
-
-          {errorMessage && (
-            <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
-              {errorMessage}
-            </div>
-          )}
-
-          {successMessage && (
-            <div className="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-green-700">
-              {successMessage}
-            </div>
-          )}
-
-          <div className="mb-8 flex flex-col items-center">
-            <div
-              className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-4"
-              style={{ borderColor: "rgba(241,116,94,0.25)", backgroundColor: "#fbf3b9" }}
-            >
-              {avatarUrl.trim() ? (
-                <img
-                  src={avatarUrl}
-                  alt="Profile preview"
-                  className="h-full w-full object-cover"
-                />
-              ) : (
-                <UserCircle2 size={72} color={COLORS.text} />
-              )}
-            </div>
-            <div className="mt-4 flex items-center gap-2 text-sm font-semibold" style={{ color: COLORS.text }}>
-              <Camera size={16} />
-              Profile photo preview
-            </div>
-            <label
-              className="mt-4 inline-flex cursor-pointer items-center justify-center rounded-lg px-4 py-3 text-sm font-bold text-white disabled:opacity-60"
-              style={{ backgroundColor: COLORS.primary }}
-            >
-              {uploadingAvatar ? "Uploading..." : "Upload Photo"}
-              <input
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                className="hidden"
-                onChange={handleAvatarUpload}
-                disabled={uploadingAvatar || saving || changingPassword || deletingAccount}
-              />
-            </label>
-            <p className="mt-2 text-center text-sm text-gray-500">
-              Upload a JPG, PNG, or WEBP image up to 2MB.
+      <main className="mx-auto flex w-full max-w-[1440px] flex-1 items-center justify-center px-4 py-8 sm:px-6 lg:px-10">
+        <div className="w-full max-w-3xl">
+          <div className="mb-8 text-center">
+            <h1 className="text-4xl font-black sm:text-5xl md:text-6xl" style={{ color: COLORS.text }}>
+              Settings
+            </h1>
+            <p className="mt-3 text-sm sm:text-base" style={{ color: COLORS.textSoft }}>
+              Manage your profile, password, and account preferences.
             </p>
           </div>
 
-          <div className="mb-6">
-            <label className="block mb-2 font-semibold text-gray-800">
-              Display Name
-            </label>
-            <input
-              type="text"
-              value={displayName}
-              onChange={(e) => setDisplayName(e.target.value)}
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f1745e]"
-            />
-          </div>
+          <div
+            className="rounded-[32px] border p-6 shadow-[0_28px_70px_rgba(79,37,42,0.10)] sm:p-10"
+            style={{ backgroundColor: COLORS.panel, borderColor: COLORS.border }}
+          >
+            {errorMessage && (
+              <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+                {errorMessage}
+              </div>
+            )}
 
-          <div className="mb-8">
-            <label className="block mb-2 font-semibold text-gray-800">
-              Email
-            </label>
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f1745e]"
-            />
-          </div>
+            {successMessage && (
+              <div className="mb-4 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-green-700">
+                {successMessage}
+              </div>
+            )}
 
-          <div className="flex flex-col sm:flex-row justify-center gap-4">
-            <button
-              className="px-6 py-3 rounded-lg text-white font-bold disabled:opacity-60"
-              style={{ backgroundColor: COLORS.primary }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = COLORS.primaryHover;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = COLORS.primary;
-              }}
-              onClick={handleSaveChanges}
-              disabled={saving || uploadingAvatar || changingPassword || deletingAccount}
-            >
-              {saving ? "Saving..." : "Save Changes"}
-            </button>
+            <div className="mb-8 flex flex-col items-center">
+              <div
+                className="flex h-28 w-28 items-center justify-center overflow-hidden rounded-full border-4"
+                style={{ borderColor: "rgba(241,116,94,0.25)", backgroundColor: COLORS.side }}
+              >
+                {avatarUrl.trim() ? (
+                  <img src={avatarUrl} alt="Profile preview" className="h-full w-full object-cover" />
+                ) : (
+                  <UserCircle2 size={72} color={COLORS.text} />
+                )}
+              </div>
+              <div className="mt-4 flex items-center gap-2 text-sm font-semibold" style={{ color: COLORS.text }}>
+                <Camera size={16} />
+                Profile photo preview
+              </div>
+              <label
+                className="mt-4 inline-flex cursor-pointer items-center justify-center rounded-full px-5 py-3 text-sm font-bold text-white disabled:opacity-60"
+                style={{ backgroundColor: COLORS.primary }}
+              >
+                {uploadingAvatar ? "Uploading..." : "Upload Photo"}
+                <input
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp"
+                  className="hidden"
+                  onChange={handleAvatarUpload}
+                  disabled={uploadingAvatar || saving || changingPassword || deletingAccount}
+                />
+              </label>
+              <p className="mt-2 text-center text-sm" style={{ color: COLORS.textSoft }}>
+                Upload a JPG, PNG, or WEBP image up to 2MB.
+              </p>
+            </div>
 
-            <button
-              className="px-6 py-3 rounded-lg font-bold border"
-              style={{
-                backgroundColor: "#fbf3b9",
-                color: COLORS.text,
-                borderColor: COLORS.text,
-              }}
-              onClick={openPasswordModal}
-              disabled={saving || uploadingAvatar || changingPassword || deletingAccount}
-            >
-              Change Password
-            </button>
+            <div className="mb-6">
+              <label className="mb-2 block font-semibold" style={{ color: COLORS.text }}>
+                Display Name
+              </label>
+              <input
+                type="text"
+                value={displayName}
+                onChange={(e) => setDisplayName(e.target.value)}
+                className="w-full rounded-2xl border bg-white/80 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#f1745e]"
+                style={{ borderColor: COLORS.border, color: COLORS.text }}
+              />
+            </div>
 
-            <button
-              className="px-6 py-3 rounded-lg font-bold border border-red-400 text-red-600"
-              onClick={openDeleteModal}
-              disabled={saving || uploadingAvatar || changingPassword || deletingAccount}
-            >
-              Delete Account
-            </button>
+            <div className="mb-8">
+              <label className="mb-2 block font-semibold" style={{ color: COLORS.text }}>
+                Email
+              </label>
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full rounded-2xl border bg-white/80 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#f1745e]"
+                style={{ borderColor: COLORS.border, color: COLORS.text }}
+              />
+            </div>
+
+            <div className="flex flex-col justify-center gap-4 sm:flex-row">
+              <button
+                className="rounded-full px-6 py-3 font-bold text-white disabled:opacity-60"
+                style={{ backgroundColor: COLORS.primary }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.backgroundColor = COLORS.primaryHover;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.backgroundColor = COLORS.primary;
+                }}
+                onClick={handleSaveChanges}
+                disabled={saving || uploadingAvatar || changingPassword || deletingAccount}
+              >
+                {saving ? "Saving..." : "Save Changes"}
+              </button>
+
+              <button
+                className="rounded-full border px-6 py-3 font-bold"
+                style={{
+                  backgroundColor: COLORS.panelSoft,
+                  color: COLORS.text,
+                  borderColor: COLORS.border,
+                }}
+                onClick={openPasswordModal}
+                disabled={saving || uploadingAvatar || changingPassword || deletingAccount}
+              >
+                Change Password
+              </button>
+
+              <button
+                className="rounded-full border border-red-400 px-6 py-3 font-bold text-red-600"
+                onClick={openDeleteModal}
+                disabled={saving || uploadingAvatar || changingPassword || deletingAccount}
+              >
+                Delete Account
+              </button>
+            </div>
           </div>
         </div>
       </main>
 
       {showPasswordModal && (
-        <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center px-4">
-          <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl border p-6">
-            <h2 className="text-2xl font-extrabold text-[#4f252a] mb-3">
-              Change Password
-            </h2>
-            <p className="text-[#4f252a]/75 mb-4">
-              Enter your new password below.
-            </p>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
+          <div
+            className="w-full max-w-md rounded-[28px] border p-6 shadow-2xl"
+            style={{ backgroundColor: COLORS.panel, borderColor: COLORS.border }}
+          >
+            <h2 className="mb-3 text-2xl font-extrabold text-[#4f252a]">Change Password</h2>
+            <p className="mb-4 text-[#4f252a]/75">Enter your new password below.</p>
 
             <input
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
               placeholder="Enter your new password"
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f1745e]"
+              className="w-full rounded-2xl border px-4 py-3 focus:outline-none focus:ring-2 focus:ring-[#f1745e]"
+              style={{ borderColor: COLORS.border }}
             />
 
             <div className="mt-5 flex justify-end gap-3">
@@ -437,7 +431,8 @@ export default function SettingsPage() {
                   setShowPasswordModal(false);
                   setNewPassword("");
                 }}
-                className="px-5 py-2 rounded-lg font-bold border text-[#4f252a]"
+                className="rounded-2xl border px-5 py-2 font-bold text-[#4f252a]"
+                style={{ borderColor: COLORS.border }}
               >
                 Cancel
               </button>
@@ -445,7 +440,7 @@ export default function SettingsPage() {
               <button
                 onClick={handleChangePassword}
                 disabled={changingPassword}
-                className="px-5 py-2 rounded-lg font-bold text-white disabled:opacity-60"
+                className="rounded-2xl px-5 py-2 font-bold text-white disabled:opacity-60"
                 style={{ backgroundColor: COLORS.primary }}
               >
                 {changingPassword ? "Saving..." : "Save"}
@@ -456,19 +451,21 @@ export default function SettingsPage() {
       )}
 
       {showDeleteModal && (
-        <div className="fixed inset-0 z-50 bg-black/30 flex items-center justify-center px-4">
-          <div className="w-full max-w-md rounded-2xl bg-white shadow-2xl border p-6">
-            <h2 className="text-2xl font-extrabold text-[#4f252a] mb-3">
-              Delete Account
-            </h2>
-            <p className="text-[#4f252a]/75 mb-5">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 px-4">
+          <div
+            className="w-full max-w-md rounded-[28px] border p-6 shadow-2xl"
+            style={{ backgroundColor: COLORS.panel, borderColor: COLORS.border }}
+          >
+            <h2 className="mb-3 text-2xl font-extrabold text-[#4f252a]">Delete Account</h2>
+            <p className="mb-5 text-[#4f252a]/75">
               Are you sure you want to delete your account? This cannot be undone.
             </p>
 
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowDeleteModal(false)}
-                className="px-5 py-2 rounded-lg font-bold border text-[#4f252a]"
+                className="rounded-2xl border px-5 py-2 font-bold text-[#4f252a]"
+                style={{ borderColor: COLORS.border }}
               >
                 Cancel
               </button>
@@ -476,7 +473,7 @@ export default function SettingsPage() {
               <button
                 onClick={handleDeleteAccount}
                 disabled={deletingAccount}
-                className="px-5 py-2 rounded-lg font-bold text-white disabled:opacity-60"
+                className="rounded-2xl px-5 py-2 font-bold text-white disabled:opacity-60"
                 style={{ backgroundColor: "#dc2626" }}
               >
                 {deletingAccount ? "Deleting..." : "Delete"}

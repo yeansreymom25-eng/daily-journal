@@ -2,19 +2,28 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ArrowLeft, LogOut, Tag } from "lucide-react";
 import type { User } from "@supabase/supabase-js";
 import { createDraft, createEntry } from "@/lib/journal";
 import { getCurrentUser, signOutUser } from "@/lib/auth";
+
+function getErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof Error && error.message) return error.message;
+  return fallback;
+}
 
 export default function NewEntryPage() {
   const router = useRouter();
 
   const COLORS = {
-    bg: "#edd0ac",
     top: "#4f252a",
     primary: "#f1745e",
+    primaryHover: "#df624f",
     text: "#4f252a",
-    cardBorder: "rgba(79,37,42,0.25)",
+    textSoft: "#7d5953",
+    panel: "#fffaf4",
+    panelSoft: "rgba(255,250,244,0.78)",
+    border: "rgba(79,37,42,0.14)",
   };
 
   const [user, setUser] = useState<User | null>(null);
@@ -22,7 +31,7 @@ export default function NewEntryPage() {
 
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
-  const [selectedEmoji, setSelectedEmoji] = useState<string>("");
+  const [selectedEmoji, setSelectedEmoji] = useState("");
 
   const [savingEntry, setSavingEntry] = useState(false);
   const [savingDraft, setSavingDraft] = useState(false);
@@ -30,10 +39,10 @@ export default function NewEntryPage() {
 
   const emojis = useMemo(
     () => [
-      "😀","😊","🥹","😍","😎","🤩","😴","😵","😮","😳",
-      "🥲","😡","😭","😇","🤯","😌","🤔","😬","😐","🫶",
-      "💪","🙏","🔥","🌸","✨","🌈","⭐","💡","📚","🎯",
-      "🎵","🍀","☕","🍓","🌻","🌙","💖","✅",
+      "😀", "😊", "🥹", "😍", "😎", "🤩", "😴", "😵", "😮", "😳",
+      "🥲", "😡", "😭", "😇", "🤯", "😌", "🤔", "😬", "😐", "🫶",
+      "💪", "🙏", "🔥", "🌸", "✨", "🌈", "⭐", "💡", "📚", "🎯",
+      "🎵", "🍀", "☕", "🍓", "🌻", "🌙", "💖", "✅",
     ],
     []
   );
@@ -58,8 +67,8 @@ export default function NewEntryPage() {
     try {
       await signOutUser();
       router.push("/login");
-    } catch (error: any) {
-      setErrorMessage(error.message || "Logout failed.");
+    } catch (error: unknown) {
+      setErrorMessage(getErrorMessage(error, "Logout failed."));
     }
   }
 
@@ -78,8 +87,8 @@ export default function NewEntryPage() {
       });
 
       router.push(`/entry/${entry.id}`);
-    } catch (error: any) {
-      setErrorMessage(error.message || "Failed to save entry.");
+    } catch (error: unknown) {
+      setErrorMessage(getErrorMessage(error, "Failed to save entry."));
     } finally {
       setSavingEntry(false);
     }
@@ -100,8 +109,8 @@ export default function NewEntryPage() {
       });
 
       router.push(`/drafts/${draft.id}`);
-    } catch (error: any) {
-      setErrorMessage(error.message || "Failed to save draft.");
+    } catch (error: unknown) {
+      setErrorMessage(getErrorMessage(error, "Failed to save draft."));
     } finally {
       setSavingDraft(false);
     }
@@ -111,7 +120,10 @@ export default function NewEntryPage() {
     return (
       <div
         className="min-h-screen flex items-center justify-center text-2xl font-bold"
-        style={{ background: COLORS.bg, color: COLORS.text }}
+        style={{
+          background: "linear-gradient(180deg, #f7e8d0 0%, #ecd3b2 55%, #e5c5a0 100%)",
+          color: COLORS.text,
+        }}
       >
         Loading...
       </div>
@@ -120,76 +132,97 @@ export default function NewEntryPage() {
 
   return (
     <div
-      className="h-screen overflow-hidden flex flex-col relative"
-      style={{ background: COLORS.bg }}
+      className="min-h-screen flex flex-col"
+      style={{
+        background: "linear-gradient(180deg, #f7e8d0 0%, #ecd3b2 55%, #e5c5a0 100%)",
+      }}
     >
       <header
-        className="w-full border-b shadow-md flex-shrink-0"
-        style={{ background: COLORS.top }}
+        className="w-full border-b shadow-sm"
+        style={{ backgroundColor: COLORS.top, borderColor: "rgba(255,255,255,0.08)" }}
       >
-        <div className="w-full px-10 py-3 flex justify-end">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-end px-6 py-4 lg:px-10">
           <button
             onClick={handleLogout}
-            className="text-white font-bold px-6 py-2 rounded-xl text-base transition"
-            style={{ background: COLORS.primary }}
+            className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white transition"
+            style={{ backgroundColor: COLORS.primary }}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = COLORS.primaryHover;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = COLORS.primary;
+            }}
           >
+            <LogOut size={18} />
             Log Out
           </button>
         </div>
       </header>
 
-      <main className="flex-1 flex justify-center items-start px-6 py-4 relative overflow-hidden">
-        <div className="w-full max-w-[1100px] relative h-full flex flex-col">
+      <main className="mx-auto flex w-full max-w-[1440px] flex-1 px-6 py-8 lg:px-10">
+        <div className="w-full">
           <button
             onClick={() => router.back()}
-            className="text-2xl font-extrabold mb-3 flex items-center gap-2 flex-shrink-0"
+            className="mb-5 inline-flex items-center gap-2 text-lg font-black transition hover:opacity-75"
             style={{ color: COLORS.text }}
           >
-            ← Back
+            <ArrowLeft size={20} />
+            Back
           </button>
 
           <div
-            className="bg-white rounded-3xl shadow-xl overflow-hidden flex-1 min-h-0"
-            style={{ border: `1.5px solid ${COLORS.cardBorder}` }}
+            className="overflow-hidden rounded-[36px] border shadow-[0_28px_70px_rgba(79,37,42,0.10)]"
+            style={{ backgroundColor: COLORS.panel, borderColor: COLORS.border }}
           >
-            <div className="px-10 py-4 border-b flex items-center gap-4 flex-shrink-0">
-              <span className="text-3xl">🏷️</span>
-              <input
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder="Title"
-                className="w-full text-2xl font-bold outline-none"
-                style={{ color: COLORS.text }}
-              />
+            <div
+              className="border-b px-6 py-5 sm:px-8"
+              style={{ backgroundColor: COLORS.panelSoft, borderColor: COLORS.border }}
+            >
+              <div className="mb-2 text-sm font-semibold uppercase tracking-[0.25em]" style={{ color: COLORS.textSoft }}>
+                New Entry
+              </div>
+              <div className="flex items-center gap-3">
+                <Tag size={20} color={COLORS.primary} />
+                <input
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                  placeholder="Title"
+                  className="w-full bg-transparent text-3xl font-black outline-none"
+                  style={{ color: COLORS.text }}
+                />
+              </div>
             </div>
 
-            <div className="px-10 py-4 border-b flex-shrink-0">
+            <div
+              className="border-b px-6 py-5 sm:px-8"
+              style={{ backgroundColor: COLORS.panelSoft, borderColor: COLORS.border }}
+            >
+              <div className="mb-3 text-sm font-semibold uppercase tracking-[0.2em]" style={{ color: COLORS.textSoft }}>
+                Mood
+              </div>
               <div className="flex flex-wrap gap-3">
-                {emojis.map((em) => {
-                  const active = selectedEmoji === em;
+                {emojis.map((emoji) => {
+                  const active = selectedEmoji === emoji;
+
                   return (
                     <button
-                      key={em}
+                      key={emoji}
                       type="button"
-                      onClick={() => setSelectedEmoji(em)}
-                      className="text-2xl rounded-xl px-4 py-2 transition border shadow-sm"
+                      onClick={() => setSelectedEmoji(emoji)}
+                      className="rounded-2xl border px-4 py-2 text-2xl shadow-sm transition"
                       style={{
-                        borderColor: active
-                          ? COLORS.primary
-                          : "rgba(79,37,42,0.15)",
-                        background: active
-                          ? "rgba(241,116,94,0.15)"
-                          : "white",
+                        borderColor: active ? COLORS.primary : "rgba(79,37,42,0.12)",
+                        backgroundColor: active ? "rgba(241,116,94,0.14)" : "rgba(255,255,255,0.92)",
                       }}
                     >
-                      {em}
+                      {emoji}
                     </button>
                   );
                 })}
               </div>
             </div>
 
-            <div className="px-10 py-5 h-full min-h-0">
+            <div className="px-6 py-6 sm:px-8">
               {errorMessage && (
                 <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
                   {errorMessage}
@@ -200,32 +233,23 @@ export default function NewEntryPage() {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Start writing here..."
-                className="w-full rounded-xl outline-none resize-none"
-                style={{
-                  color: "#333",
-                  height: errorMessage
-                    ? "calc(100vh - 72px - 56px - 64px - 190px)"
-                    : "calc(100vh - 72px - 56px - 64px - 140px)",
-                }}
+                className="min-h-[360px] w-full resize-none bg-transparent text-lg leading-8 outline-none sm:min-h-[420px]"
+                style={{ color: COLORS.text }}
               />
             </div>
           </div>
 
-          <img
-            src="/images/clock.png"
-            alt="Clock"
-            className="absolute right-[-180px] top-[55px] w-[270px] h-auto select-none pointer-events-none"
-            draggable={false}
-          />
-
-          <div className="flex justify-center gap-10 mt-5 flex-shrink-0">
+          <div className="mt-6 flex flex-wrap justify-center gap-5">
             <button
               onClick={onSave}
               disabled={savingEntry || savingDraft}
-              className="px-16 py-4 rounded-2xl font-extrabold text-lg transition shadow-md disabled:opacity-60"
-              style={{
-                background: COLORS.primary,
-                color: "white",
+              className="rounded-full px-12 py-4 text-lg font-black text-white shadow-md transition disabled:opacity-60"
+              style={{ backgroundColor: COLORS.primary }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = COLORS.primaryHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = COLORS.primary;
               }}
             >
               {savingEntry ? "Saving..." : "Save"}
@@ -234,10 +258,11 @@ export default function NewEntryPage() {
             <button
               onClick={onSaveDraft}
               disabled={savingEntry || savingDraft}
-              className="px-14 py-4 rounded-2xl font-extrabold text-lg transition shadow-md disabled:opacity-60"
+              className="rounded-full border px-12 py-4 text-lg font-black transition disabled:opacity-60"
               style={{
-                background: "#d9d9d9",
-                color: "#111",
+                backgroundColor: COLORS.panel,
+                borderColor: COLORS.border,
+                color: COLORS.text,
               }}
             >
               {savingDraft ? "Saving Draft..." : "Save as Draft"}

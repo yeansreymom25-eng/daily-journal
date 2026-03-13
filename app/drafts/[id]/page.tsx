@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useEffect, useState, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { ArrowLeft, LogOut } from "lucide-react";
 import { getCurrentUser, signOutUser } from "@/lib/auth";
 import {
   deleteDraft,
@@ -10,21 +11,25 @@ import {
   updateDraft,
 } from "@/lib/journal";
 
+function getErrorMessage(error: unknown, fallback: string) {
+  if (error instanceof Error && error.message) return error.message;
+  return fallback;
+}
+
 export default function DraftDetailPage() {
   const router = useRouter();
   const params = useParams();
   const id = String(params?.id || "");
 
   const COLORS = {
-    bg: "#edd0ac",
     top: "#4f252a",
-    side: "#fbf3b9",
-    text: "#4f252a",
     primary: "#f1745e",
-    primaryHover: "#e06464",
-    border: "rgba(79,37,42,0.22)",
-    card: "rgba(255,255,255,0.65)",
-    softWhite: "rgba(255,255,255,0.55)",
+    primaryHover: "#df624f",
+    text: "#4f252a",
+    textSoft: "#7d5953",
+    panel: "#fffaf4",
+    panelSoft: "rgba(255,250,244,0.78)",
+    border: "rgba(79,37,42,0.14)",
   };
 
   const [title, setTitle] = useState("Draft");
@@ -37,6 +42,8 @@ export default function DraftDetailPage() {
   const [savingDraft, setSavingDraft] = useState(false);
   const [deleting, setDeleting] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     const loadDraft = async () => {
@@ -57,10 +64,10 @@ export default function DraftDetailPage() {
             year: "numeric",
             month: "long",
             day: "numeric",
-          }),
+          })
         );
-      } catch (error: any) {
-        setErrorMessage(error.message || "Failed to load draft.");
+      } catch (error: unknown) {
+        setErrorMessage(getErrorMessage(error, "Failed to load draft."));
         router.push("/drafts");
       } finally {
         setLoading(false);
@@ -72,30 +79,18 @@ export default function DraftDetailPage() {
     }
   }, [id, router]);
 
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
-
   useEffect(() => {
-    if (textareaRef.current) {
-      textareaRef.current.style.height = "auto";
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
-    }
+    if (!textareaRef.current) return;
+    textareaRef.current.style.height = "auto";
+    textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
   }, [content]);
-
-  const hoverPrimary = (
-    e: React.MouseEvent<HTMLButtonElement>,
-    on: boolean,
-  ) => {
-    e.currentTarget.style.backgroundColor = on
-      ? COLORS.primaryHover
-      : COLORS.primary;
-  };
 
   async function handleLogout() {
     try {
       await signOutUser();
       router.push("/login");
-    } catch (error: any) {
-      setErrorMessage(error.message || "Logout failed.");
+    } catch (error: unknown) {
+      setErrorMessage(getErrorMessage(error, "Logout failed."));
     }
   }
 
@@ -113,8 +108,8 @@ export default function DraftDetailPage() {
       });
 
       router.push("/drafts");
-    } catch (error: any) {
-      setErrorMessage(error.message || "Failed to save draft.");
+    } catch (error: unknown) {
+      setErrorMessage(getErrorMessage(error, "Failed to save draft."));
     } finally {
       setSavingDraft(false);
     }
@@ -135,8 +130,8 @@ export default function DraftDetailPage() {
 
       const entry = await publishDraft(id);
       router.push(`/entry/${entry.id}`);
-    } catch (error: any) {
-      setErrorMessage(error.message || "Failed to publish draft.");
+    } catch (error: unknown) {
+      setErrorMessage(getErrorMessage(error, "Failed to publish draft."));
     } finally {
       setSavingPublish(false);
     }
@@ -151,8 +146,8 @@ export default function DraftDetailPage() {
     try {
       await deleteDraft(id);
       router.push("/drafts");
-    } catch (error: any) {
-      setErrorMessage(error.message || "Failed to delete draft.");
+    } catch (error: unknown) {
+      setErrorMessage(getErrorMessage(error, "Failed to delete draft."));
     } finally {
       setDeleting(false);
     }
@@ -162,7 +157,10 @@ export default function DraftDetailPage() {
     return (
       <div
         className="min-h-screen flex items-center justify-center text-2xl font-bold"
-        style={{ backgroundColor: COLORS.bg, color: COLORS.text }}
+        style={{
+          background: "linear-gradient(180deg, #f7e8d0 0%, #ecd3b2 55%, #e5c5a0 100%)",
+          color: COLORS.text,
+        }}
       >
         Loading...
       </div>
@@ -171,125 +169,116 @@ export default function DraftDetailPage() {
 
   return (
     <div
-      className="min-h-screen flex flex-col overflow-x-hidden"
-      style={{ backgroundColor: COLORS.bg }}
+      className="min-h-screen flex flex-col"
+      style={{
+        background: "linear-gradient(180deg, #f7e8d0 0%, #ecd3b2 55%, #e5c5a0 100%)",
+      }}
     >
       <header
-        className="w-full flex-shrink-0"
-        style={{ backgroundColor: COLORS.top }}
+        className="w-full border-b shadow-sm"
+        style={{ backgroundColor: COLORS.top, borderColor: "rgba(255,255,255,0.08)" }}
       >
-        <div className="w-full px-4 sm:px-6 md:px-10 py-4 flex items-center justify-end">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-end px-6 py-4 lg:px-10">
           <button
             onClick={handleLogout}
-            className="text-white font-bold px-5 py-2 rounded-lg transition"
+            className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white transition"
             style={{ backgroundColor: COLORS.primary }}
-            onMouseEnter={(e) => hoverPrimary(e, true)}
-            onMouseLeave={(e) => hoverPrimary(e, false)}
+            onMouseEnter={(e) => {
+              e.currentTarget.style.backgroundColor = COLORS.primaryHover;
+            }}
+            onMouseLeave={(e) => {
+              e.currentTarget.style.backgroundColor = COLORS.primary;
+            }}
           >
+            <LogOut size={18} />
             Log Out
           </button>
         </div>
       </header>
 
-      <main className="flex-1 px-4 sm:px-6 md:px-10 py-6">
-        <div className="mx-auto w-full max-w-6xl flex flex-col flex-1">
-          <div className="flex items-center justify-between flex-shrink-0">
-            <div className="flex items-center gap-4 sm:gap-6 min-w-0">
-              <button
-                onClick={() => router.push("/drafts")}
-                className="text-5xl sm:text-6xl font-bold leading-none"
-                style={{ color: COLORS.text }}
-              >
-                ←
-              </button>
+      <main className="mx-auto flex w-full max-w-[1440px] flex-1 px-6 py-8 lg:px-10">
+        <div className="w-full">
+          <button
+            onClick={() => router.push("/drafts")}
+            className="mb-5 inline-flex items-center gap-2 text-lg font-black transition hover:opacity-75"
+            style={{ color: COLORS.text }}
+          >
+            <ArrowLeft size={20} />
+            Back
+          </button>
 
-              <div className="min-w-0">
-               <div className="flex items-center gap-3 sm:gap-4">
-                  <h1
-                    className="text-4xl sm:text-5xl md:text-6xl font-extrabold truncate"
-                    style={{ color: COLORS.text }}
-                  >
-                    {title}
-                  </h1>
-                  <span className="text-4xl sm:text-5xl">{mood}</span>
-                </div>
-                <div
-                  className="mt-2 text-xl sm:text-2xl md:text-3xl"
-                  style={{ color: "rgba(79,37,42,0.55)" }}
-                >
-                  {createdAt}
-                </div>
+          <div
+            className="rounded-[36px] border shadow-[0_28px_70px_rgba(79,37,42,0.10)]"
+            style={{ backgroundColor: COLORS.panel, borderColor: COLORS.border }}
+          >
+            <div
+              className="border-b px-6 py-5 sm:px-8"
+              style={{ backgroundColor: COLORS.panelSoft, borderColor: COLORS.border }}
+            >
+              <div className="flex flex-wrap items-center gap-3">
+                <h1 className="text-3xl font-black sm:text-5xl" style={{ color: COLORS.text }}>
+                  {title}
+                </h1>
+                {mood && <span className="text-4xl">{mood}</span>}
+              </div>
+              <div className="mt-3 text-sm font-semibold uppercase tracking-[0.2em]" style={{ color: COLORS.textSoft }}>
+                {createdAt}
               </div>
             </div>
-          </div>
 
-          {errorMessage && (
-            <div className="mt-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
-              {errorMessage}
-            </div>
-          )}
+            <div className="px-6 py-6 sm:px-8">
+              {errorMessage && (
+                <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
+                  {errorMessage}
+                </div>
+              )}
 
-          <div className="mt-6 flex-1 flex gap-6 lg:gap-10 items-start flex-col lg:flex-row">
-            <div
-              className="flex-1 rounded-2xl border p-6 sm:p-10 w-full min-w-0"
-              style={{
-                backgroundColor: COLORS.card,
-                borderColor: COLORS.border,
-                boxShadow: "0 18px 35px rgba(79,37,42,0.18)",
-              }}
-            >
               <textarea
                 ref={textareaRef}
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Start writing your draft..."
-                className="w-full min-h-[300px] outline-none resize-none overflow-hidden text-xl sm:text-2xl md:text-3xl leading-relaxed whitespace-pre-wrap break-words"
-                style={{ backgroundColor: "transparent", color: COLORS.text }}
-              />
-            </div>
-
-            <div className="hidden lg:block w-[360px] relative">
-              <img
-                src="/images/coffee.png"
-                alt="Coffee"
-                className="w-[420px] h-auto select-none"
-                draggable={false}
-                style={{ marginLeft: "-20px", marginTop: "20px" }}
+                className="min-h-[320px] w-full resize-none bg-transparent text-lg leading-8 outline-none sm:min-h-[420px]"
+                style={{ color: COLORS.text }}
               />
             </div>
           </div>
 
-          <div className="mt-6 flex items-center gap-4 sm:gap-10 flex-shrink-0 flex-wrap">
+          <div className="mt-6 flex flex-wrap gap-5">
             <button
               onClick={handlePublish}
               disabled={savingPublish || savingDraft || deleting}
-              className="px-10 sm:px-16 py-4 sm:py-5 rounded-xl text-xl sm:text-3xl font-bold text-white transition disabled:opacity-60"
+              className="rounded-full px-12 py-4 text-lg font-black text-white shadow-md transition disabled:opacity-60"
               style={{ backgroundColor: COLORS.primary }}
-              onMouseEnter={(e) => hoverPrimary(e, true)}
-              onMouseLeave={(e) => hoverPrimary(e, false)}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = COLORS.primaryHover;
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = COLORS.primary;
+              }}
             >
-              {savingPublish ? "Saving..." : "Save"}
+              {savingPublish ? "Saving..." : "Publish"}
             </button>
 
             <button
               onClick={handleSaveAsDraft}
               disabled={savingPublish || savingDraft || deleting}
-              className="px-10 sm:px-16 py-4 sm:py-5 rounded-xl text-xl sm:text-3xl font-bold border transition disabled:opacity-60"
+              className="rounded-full border px-12 py-4 text-lg font-black transition disabled:opacity-60"
               style={{
-                backgroundColor: "rgba(255,255,255,0.55)",
+                backgroundColor: COLORS.panelSoft,
                 borderColor: COLORS.border,
                 color: COLORS.text,
               }}
             >
-              {savingDraft ? "Saving Draft..." : "Save as Draft"}
+              {savingDraft ? "Saving Draft..." : "Save Draft"}
             </button>
 
             <button
               onClick={handleDelete}
               disabled={savingPublish || savingDraft || deleting}
-              className="px-10 sm:px-16 py-4 sm:py-5 rounded-xl text-xl sm:text-3xl font-bold border transition disabled:opacity-60"
+              className="rounded-full border px-12 py-4 text-lg font-black transition disabled:opacity-60"
               style={{
-                backgroundColor: "rgba(255,255,255,0.55)",
+                backgroundColor: COLORS.panelSoft,
                 borderColor: COLORS.border,
                 color: "#cc1f1f",
               }}
