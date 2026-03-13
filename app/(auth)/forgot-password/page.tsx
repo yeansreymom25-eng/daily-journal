@@ -5,8 +5,6 @@ import Link from "next/link";
 import { useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useRouter } from "next/navigation";
-import bookFlowerImage from "../../../public/images/book-flower.png";
-import journalImage from "../../../public/images/journal.png";
 
 export default function ForgotPasswordPage() {
   const router = useRouter();
@@ -61,7 +59,7 @@ export default function ForgotPasswordPage() {
           style={{ borderColor: "rgba(79,37,42,0.14)" }}
         >
           <div className="flex flex-col items-start">
-            <Image src={journalImage} alt="Daily Journal" className="w-[110px] h-auto" priority />
+            <Image src="/images/journal.png" alt="Daily Journal" width={110} height={110} className="w-[110px] h-auto" priority />
             <h2 className="mt-5 text-3xl font-extrabold text-[#4f252a]">Forgot password?</h2>
             <p className="mt-2 text-[#4f252a]/80 text-base leading-relaxed">No worries. We&apos;ll help you reset it safely.</p>
           </div>
@@ -74,7 +72,7 @@ export default function ForgotPasswordPage() {
           </div>
 
           <div className="mt-auto pt-6">
-            <Image src={bookFlowerImage} alt="Book with flowers" className="w-[320px] h-auto opacity-95" />
+            <Image src="/images/book-flower.png" alt="Book with flowers" width={320} height={320} className="w-[320px] h-auto opacity-95" />
           </div>
         </aside>
 
@@ -124,7 +122,7 @@ export default function ForgotPasswordPage() {
               </div>
 
               <div className="md:hidden mt-8 flex justify-center">
-                <Image src={bookFlowerImage} alt="Book with flowers" className="w-[280px] h-auto opacity-95" />
+                <Image src="/images/book-flower.png" alt="Book with flowers" width={280} height={280} className="w-[280px] h-auto opacity-95" />
               </div>
             </div>
           </div>
