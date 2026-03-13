@@ -6,6 +6,7 @@ import type { User } from "@supabase/supabase-js";
 import { Camera, UserCircle2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { getAvatarUrl, getCurrentUser, getDisplayName, signOutUser } from "@/lib/auth";
+import { PROFILE_BUCKET, uploadProfileImage } from "@/lib/profile";
 
 function getErrorMessage(error: unknown, fallback: string) {
   if (error instanceof Error && error.message) return error.message;
@@ -28,6 +29,7 @@ export default function SettingsPage() {
   const [displayName, setDisplayName] = useState("");
   const [email, setEmail] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("");
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -117,6 +119,55 @@ export default function SettingsPage() {
       setErrorMessage(getErrorMessage(error, "Failed to save changes."));
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleAvatarUpload(event: React.ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!file || !user) return;
+
+    setUploadingAvatar(true);
+    setErrorMessage("");
+    setSuccessMessage("");
+
+    try {
+      const uploadedAvatarUrl = await uploadProfileImage(user.id, file);
+
+      const { error } = await supabase.auth.updateUser({
+        data: {
+          full_name: displayName,
+          avatar_url: uploadedAvatarUrl,
+        },
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      setAvatarUrl(uploadedAvatarUrl);
+      setUser((prev) => {
+        if (!prev) return prev;
+
+        return {
+          ...prev,
+          user_metadata: {
+            ...prev.user_metadata,
+            full_name: displayName,
+            avatar_url: uploadedAvatarUrl,
+          },
+        };
+      });
+      setSuccessMessage("Profile photo updated successfully.");
+    } catch (error: unknown) {
+      setErrorMessage(
+        getErrorMessage(
+          error,
+          `Failed to upload profile photo. Make sure the '${PROFILE_BUCKET}' storage bucket exists and is public.`
+        )
+      );
+    } finally {
+      setUploadingAvatar(false);
+      event.target.value = "";
     }
   }
 
@@ -280,6 +331,22 @@ export default function SettingsPage() {
               <Camera size={16} />
               Profile photo preview
             </div>
+            <label
+              className="mt-4 inline-flex cursor-pointer items-center justify-center rounded-lg px-4 py-3 text-sm font-bold text-white disabled:opacity-60"
+              style={{ backgroundColor: COLORS.primary }}
+            >
+              {uploadingAvatar ? "Uploading..." : "Upload Photo"}
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                className="hidden"
+                onChange={handleAvatarUpload}
+                disabled={uploadingAvatar || saving || changingPassword || deletingAccount}
+              />
+            </label>
+            <p className="mt-2 text-center text-sm text-gray-500">
+              Upload a JPG, PNG, or WEBP image up to 2MB.
+            </p>
           </div>
 
           <div className="mb-6">
@@ -318,7 +385,7 @@ export default function SettingsPage() {
               className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f1745e]"
             />
             <p className="mt-2 text-sm text-gray-500">
-              Paste an image link to show your photo on the dashboard.
+              Optional fallback if you prefer using an external image link.
             </p>
           </div>
 
@@ -333,7 +400,7 @@ export default function SettingsPage() {
                 e.currentTarget.style.backgroundColor = COLORS.primary;
               }}
               onClick={handleSaveChanges}
-              disabled={saving || changingPassword || deletingAccount}
+              disabled={saving || uploadingAvatar || changingPassword || deletingAccount}
             >
               {saving ? "Saving..." : "Save Changes"}
             </button>
@@ -346,7 +413,7 @@ export default function SettingsPage() {
                 borderColor: COLORS.text,
               }}
               onClick={openPasswordModal}
-              disabled={saving || changingPassword || deletingAccount}
+              disabled={saving || uploadingAvatar || changingPassword || deletingAccount}
             >
               Change Password
             </button>
@@ -354,7 +421,7 @@ export default function SettingsPage() {
             <button
               className="px-6 py-3 rounded-lg font-bold border border-red-400 text-red-600"
               onClick={openDeleteModal}
-              disabled={saving || changingPassword || deletingAccount}
+              disabled={saving || uploadingAvatar || changingPassword || deletingAccount}
             >
               Delete Account
             </button>
