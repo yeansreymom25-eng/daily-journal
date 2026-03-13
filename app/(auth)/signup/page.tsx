@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import bookFlowerImage from "../_assets/book-flower.png";
+import journalImage from "../_assets/journal.png";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -91,7 +93,7 @@ export default function SignupPage() {
             style={{ borderColor: "rgba(79,37,42,0.14)" }}
           >
             <div className="flex flex-col items-start">
-              <Image src="/images/journal.png" alt="Daily Journal" width={110} height={110} className="w-[90px] sm:w-[110px] h-auto" draggable={false} priority />
+              <Image src={journalImage} alt="Daily Journal" className="w-[90px] sm:w-[110px] h-auto" draggable={false} priority />
               <h2 className="mt-4 sm:mt-5 text-2xl sm:text-3xl font-extrabold text-[#4f252a]">Create your account</h2>
               <p className="mt-2 text-[#4f252a]/80 text-sm sm:text-base leading-relaxed max-w-[46ch]">
                 Start journaling today. Save drafts, stay consistent, and track your mood.
@@ -114,7 +116,7 @@ export default function SignupPage() {
             </div>
 
             <div className="mt-8 lg:mt-auto pt-2 hidden lg:block">
-              <Image src="/images/book-flower.png" alt="Book with flowers" width={320} height={320} className="w-[300px] xl:w-[320px] h-auto opacity-95" draggable={false} />
+              <Image src={bookFlowerImage} alt="Book with flowers" className="w-[300px] xl:w-[320px] h-auto opacity-95" draggable={false} />
             </div>
           </aside>
 
@@ -174,7 +176,7 @@ export default function SignupPage() {
                 </div>
 
                 <div className="mt-6 flex justify-center lg:hidden">
-                  <Image src="/images/book-flower.png" alt="Book with flowers" width={300} height={300} className="w-[260px] sm:w-[300px] h-auto opacity-95" draggable={false} />
+                  <Image src={bookFlowerImage} alt="Book with flowers" className="w-[260px] sm:w-[300px] h-auto opacity-95" draggable={false} />
                 </div>
               </div>
             </div>
