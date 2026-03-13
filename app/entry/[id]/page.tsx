@@ -121,7 +121,7 @@ export default function EntryDetailPage() {
         className="w-full border-b shadow-sm"
         style={{ backgroundColor: COLORS.top, borderColor: "rgba(255,255,255,0.08)" }}
       >
-        <div className="mx-auto flex max-w-[1440px] items-center justify-end px-6 py-4 lg:px-10">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-end px-4 py-4 sm:px-6 lg:px-10">
           <button
             onClick={handleLogout}
             className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white transition"
@@ -139,11 +139,11 @@ export default function EntryDetailPage() {
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-[1440px] flex-1 px-6 py-8 lg:px-10">
+      <main className="mx-auto flex w-full max-w-[1440px] flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
         <div className="w-full">
           <button
             onClick={() => router.push("/dashboard")}
-            className="mb-5 inline-flex items-center gap-2 text-lg font-black transition hover:opacity-75"
+            className="mb-5 inline-flex items-center gap-2 text-base font-black transition hover:opacity-75 sm:text-lg"
             style={{ color: COLORS.text }}
           >
             <ArrowLeft size={20} />
@@ -151,7 +151,7 @@ export default function EntryDetailPage() {
           </button>
 
           <div
-            className="rounded-[36px] border shadow-[0_28px_70px_rgba(79,37,42,0.10)]"
+            className="rounded-[28px] border shadow-[0_28px_70px_rgba(79,37,42,0.10)] sm:rounded-[36px]"
             style={{ backgroundColor: COLORS.panel, borderColor: COLORS.border }}
           >
             <div
@@ -159,7 +159,7 @@ export default function EntryDetailPage() {
               style={{ backgroundColor: COLORS.panelSoft, borderColor: COLORS.border }}
             >
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-3xl font-black sm:text-5xl" style={{ color: COLORS.text }}>
+                <h1 className="break-words text-2xl font-black sm:text-5xl" style={{ color: COLORS.text }}>
                   {title}
                 </h1>
                 {mood && <span className="text-4xl">{mood}</span>}
@@ -177,7 +177,7 @@ export default function EntryDetailPage() {
               )}
 
               <p
-                className="min-h-[320px] whitespace-pre-wrap text-lg leading-8 sm:min-h-[420px]"
+                className="min-h-[320px] whitespace-pre-wrap break-words text-base leading-7 sm:min-h-[420px] sm:text-lg sm:leading-8"
                 style={{ color: COLORS.text }}
               >
                 {content}
@@ -185,10 +185,10 @@ export default function EntryDetailPage() {
             </div>
           </div>
 
-          <div className="mt-6 flex flex-wrap gap-5">
+          <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:gap-5">
             <button
               onClick={() => router.push(`/entry/${id}/edit`)}
-              className="rounded-full px-12 py-4 text-lg font-black text-white shadow-md transition"
+              className="w-full rounded-full px-8 py-4 text-base font-black text-white shadow-md transition sm:w-auto sm:px-12 sm:text-lg"
               style={{ backgroundColor: COLORS.primary }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = COLORS.primaryHover;
@@ -203,7 +203,7 @@ export default function EntryDetailPage() {
             <button
               onClick={handleDelete}
               disabled={deleting}
-              className="rounded-full border px-12 py-4 text-lg font-black transition disabled:opacity-60"
+              className="w-full rounded-full border px-8 py-4 text-base font-black transition disabled:opacity-60 sm:w-auto sm:px-12 sm:text-lg"
               style={{
                 backgroundColor: COLORS.panelSoft,
                 borderColor: COLORS.border,

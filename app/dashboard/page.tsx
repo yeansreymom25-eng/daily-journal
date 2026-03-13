@@ -191,23 +191,23 @@ export default function DashboardPage() {
       }}
     >
       <header
-        className="relative overflow-hidden border-b px-6 py-5 shadow-sm lg:px-10"
+        className="relative overflow-hidden border-b px-4 py-5 shadow-sm sm:px-6 lg:px-10"
         style={{ backgroundColor: COLORS.top, borderColor: "rgba(255,255,255,0.08)" }}
       >
         <div
           className="pointer-events-none absolute inset-y-0 right-0 w-1/3 blur-3xl"
           style={{ background: "radial-gradient(circle, rgba(255,255,255,0.18), transparent 70%)" }}
         />
-        <div className="relative mx-auto flex max-w-[1440px] items-center justify-between gap-4">
-          <div>
+        <div className="relative mx-auto flex max-w-[1440px] flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+          <div className="min-w-0">
             <p className="text-sm uppercase tracking-[0.35em] text-white/60">Daily Journal</p>
-            <h1 className="mt-1 text-2xl font-black text-white">A home for your reflections</h1>
+            <h1 className="mt-1 text-xl font-black text-white sm:text-2xl">A home for your reflections</h1>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap lg:w-auto lg:justify-end">
             <button
               onClick={() => router.push("/new-entry")}
-              className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5"
+              className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5"
               style={{ backgroundColor: COLORS.primary }}
             >
               <PencilLine size={18} />
@@ -224,7 +224,7 @@ export default function DashboardPage() {
 
             <button
               onClick={handleLogout}
-              className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-3 text-sm font-bold text-white transition hover:bg-white/15"
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-3 text-sm font-bold text-white transition hover:bg-white/15"
             >
               <LogOut size={18} />
               Log Out
@@ -233,9 +233,9 @@ export default function DashboardPage() {
         </div>
       </header>
 
-      <div className="mx-auto flex max-w-[1440px] flex-col gap-8 px-6 py-8 lg:flex-row lg:px-10">
+      <div className="mx-auto flex max-w-[1440px] flex-col gap-6 px-4 py-6 sm:px-6 sm:py-8 lg:flex-row lg:gap-8 lg:px-10">
         <aside
-          className="w-full shrink-0 rounded-[32px] border p-6 shadow-[0_24px_60px_rgba(79,37,42,0.08)] lg:w-[320px]"
+          className="w-full shrink-0 rounded-[28px] border p-5 shadow-[0_24px_60px_rgba(79,37,42,0.08)] sm:rounded-[32px] sm:p-6 lg:w-[320px]"
           style={{ backgroundColor: COLORS.side, borderColor: COLORS.border }}
         >
           <div
@@ -257,7 +257,7 @@ export default function DashboardPage() {
                 <p className="text-sm font-semibold uppercase tracking-[0.25em]" style={{ color: COLORS.textSoft }}>
                   Welcome back
                 </p>
-                <h2 className="text-3xl font-black">My Journal</h2>
+                <h2 className="text-2xl font-black sm:text-3xl">My Journal</h2>
               </div>
             </div>
 
@@ -303,7 +303,7 @@ export default function DashboardPage() {
 
         <section className="min-w-0 flex-1 space-y-6">
           <div
-            className="overflow-hidden rounded-[36px] border p-7 shadow-[0_28px_70px_rgba(79,37,42,0.10)]"
+            className="overflow-hidden rounded-[28px] border p-5 shadow-[0_28px_70px_rgba(79,37,42,0.10)] sm:rounded-[36px] sm:p-7"
             style={{
               background:
                 "linear-gradient(135deg, rgba(255,250,244,0.96) 0%, rgba(251,243,185,0.86) 100%)",
@@ -318,7 +318,7 @@ export default function DashboardPage() {
                 >
                   Overview
                 </p>
-                <h2 className="mt-2 text-4xl font-black leading-tight lg:text-5xl">
+                <h2 className="mt-2 text-3xl font-black leading-tight sm:text-4xl lg:text-5xl">
                   A thoughtful space to reflect, preserve meaningful moments, and write with clarity.
                 </h2>
                 <p className="mt-4 max-w-xl text-base leading-7" style={{ color: COLORS.textSoft }}>
@@ -334,7 +334,7 @@ export default function DashboardPage() {
                 <p className="text-sm font-semibold uppercase tracking-[0.2em]" style={{ color: COLORS.textSoft }}>
                   Viewing
                 </p>
-                <p className="mt-2 text-2xl font-black">{tab === "recent" ? "Recent Entries" : "Drafts"}</p>
+                <p className="mt-2 text-xl font-black sm:text-2xl">{tab === "recent" ? "Recent Entries" : "Drafts"}</p>
               </div>
             </div>
           </div>
@@ -383,19 +383,19 @@ export default function DashboardPage() {
           >
             <div className="flex flex-col gap-4 border-b pb-5 sm:flex-row sm:items-center sm:justify-between" style={{ borderColor: COLORS.border }}>
               <div>
-                <h3 className="text-3xl font-black">{tab === "recent" ? "Recent writing" : "Draft workspace"}</h3>
+                <h3 className="text-2xl font-black sm:text-3xl">{tab === "recent" ? "Recent writing" : "Draft workspace"}</h3>
                 <p className="mt-1 text-sm" style={{ color: COLORS.textSoft }}>
                   Review, continue, edit, or remove journal items from here.
                 </p>
               </div>
 
               <div
-                className="inline-flex w-fit rounded-full border p-1"
+                className="inline-flex w-full flex-wrap rounded-3xl border p-1 sm:w-fit sm:flex-nowrap sm:rounded-full"
                 style={{ borderColor: COLORS.border, backgroundColor: "rgba(249,239,188,0.42)" }}
               >
                 <button
                   onClick={() => setTab("recent")}
-                  className="rounded-full px-5 py-2.5 text-sm font-bold transition"
+                  className="flex-1 rounded-full px-5 py-2.5 text-sm font-bold transition sm:flex-none"
                   style={{
                     backgroundColor: tab === "recent" ? COLORS.primary : "transparent",
                     color: tab === "recent" ? "#fff" : COLORS.text,
@@ -405,7 +405,7 @@ export default function DashboardPage() {
                 </button>
                 <button
                   onClick={() => setTab("drafts")}
-                  className="rounded-full px-5 py-2.5 text-sm font-bold transition"
+                  className="flex-1 rounded-full px-5 py-2.5 text-sm font-bold transition sm:flex-none"
                   style={{
                     backgroundColor: tab === "drafts" ? COLORS.primary : "transparent",
                     color: tab === "drafts" ? "#fff" : COLORS.text,
@@ -458,7 +458,7 @@ export default function DashboardPage() {
                       <div className="flex flex-col gap-5 xl:flex-row xl:items-start xl:justify-between">
                         <div className="min-w-0 flex-1">
                           <div className="flex flex-wrap items-center gap-3">
-                            <h4 className="text-2xl font-black text-[#1f1717]">
+                            <h4 className="text-xl font-black text-[#1f1717] sm:text-2xl">
                               {item.title || (tab === "recent" ? "Untitled Entry" : "Untitled Draft")}
                             </h4>
                             <span

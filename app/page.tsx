@@ -13,22 +13,22 @@ export default function WelcomePage() {
         className="w-full border-b shadow-sm"
         style={{ backgroundColor: "#4f252a", borderColor: "rgba(255,255,255,0.08)" }}
       >
-        <nav className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-5 lg:px-10">
-          <div>
+        <nav className="mx-auto flex max-w-[1440px] flex-col gap-4 px-4 py-5 sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-10">
+          <div className="min-w-0">
             <p className="text-sm uppercase tracking-[0.35em] text-white/60">Daily Journal</p>
-            <h1 className="mt-1 text-2xl font-black text-white">A home for your reflections</h1>
+            <h1 className="mt-1 text-xl font-black text-white sm:text-2xl">A home for your reflections</h1>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap lg:w-auto lg:justify-end">
             <Link
               href="/login"
-              className="rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/15"
+              className="rounded-full border border-white/20 bg-white/10 px-5 py-3 text-center text-sm font-bold text-white transition hover:bg-white/15"
             >
               Login
             </Link>
             <Link
               href="/signup"
-              className="rounded-full px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5"
+              className="rounded-full px-5 py-3 text-center text-sm font-bold text-white transition hover:-translate-y-0.5"
               style={{ backgroundColor: "#f1745e" }}
             >
               Sign Up
@@ -37,9 +37,9 @@ export default function WelcomePage() {
         </nav>
       </header>
 
-      <main className="mx-auto grid max-w-[1440px] gap-8 px-6 py-10 lg:grid-cols-[1.2fr_0.8fr] lg:px-10">
+      <main className="mx-auto grid max-w-[1440px] gap-6 px-4 py-8 sm:px-6 sm:py-10 lg:grid-cols-[1.2fr_0.8fr] lg:gap-8 lg:px-10">
         <section
-          className="rounded-[36px] border p-8 shadow-[0_28px_70px_rgba(79,37,42,0.10)] lg:p-12"
+          className="rounded-[28px] border p-6 shadow-[0_28px_70px_rgba(79,37,42,0.10)] sm:rounded-[36px] sm:p-8 lg:p-12"
           style={{
             background:
               "linear-gradient(135deg, rgba(255,250,244,0.96) 0%, rgba(251,243,185,0.86) 100%)",
@@ -47,18 +47,18 @@ export default function WelcomePage() {
           }}
         >
           <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#7d5953]">Welcome</p>
-          <h2 className="mt-3 max-w-3xl text-5xl font-black leading-tight text-[#4f252a] lg:text-7xl">
+          <h2 className="mt-3 max-w-3xl text-3xl font-black leading-tight text-[#4f252a] sm:text-4xl lg:text-7xl">
             Write slowly, remember deeply, and keep every thought close.
           </h2>
-          <p className="mt-6 max-w-2xl text-lg leading-8 text-[#7d5953]">
+          <p className="mt-5 max-w-2xl text-base leading-7 text-[#7d5953] sm:mt-6 sm:text-lg sm:leading-8">
             Daily Journal gives you one calm space for reflections, moods, unfinished drafts, and the
             moments you want to revisit later.
           </p>
 
-          <div className="mt-8 flex flex-wrap gap-4">
+          <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:gap-4">
             <Link
               href="/signup"
-              className="inline-flex items-center gap-2 rounded-full px-6 py-4 text-base font-black text-white shadow-md transition hover:-translate-y-0.5"
+              className="inline-flex items-center justify-center gap-2 rounded-full px-6 py-4 text-base font-black text-white shadow-md transition hover:-translate-y-0.5"
               style={{ backgroundColor: "#f1745e" }}
             >
               Get Started
@@ -67,7 +67,7 @@ export default function WelcomePage() {
 
             <Link
               href="/login"
-              className="rounded-full border px-6 py-4 text-base font-black text-[#4f252a] transition"
+              className="rounded-full border px-6 py-4 text-center text-base font-black text-[#4f252a] transition"
               style={{ backgroundColor: "#fffaf4", borderColor: "rgba(79,37,42,0.14)" }}
             >
               Continue Writing
@@ -77,7 +77,7 @@ export default function WelcomePage() {
 
         <aside className="space-y-5">
           <div
-            className="rounded-[32px] border p-6 shadow-[0_24px_60px_rgba(79,37,42,0.08)]"
+            className="rounded-[28px] border p-5 shadow-[0_24px_60px_rgba(79,37,42,0.08)] sm:rounded-[32px] sm:p-6"
             style={{ backgroundColor: "#f9efbc", borderColor: "rgba(79,37,42,0.14)" }}
           >
             <div
@@ -86,7 +86,7 @@ export default function WelcomePage() {
             >
               <BookOpen size={28} color="#fff" />
             </div>
-            <h3 className="mt-5 text-2xl font-black text-[#4f252a]">Built for daily writing</h3>
+            <h3 className="mt-5 text-xl font-black text-[#4f252a] sm:text-2xl">Built for daily writing</h3>
             <p className="mt-3 text-sm leading-7 text-[#7d5953]">
               Capture quick thoughts, shape longer entries, and return to drafts whenever inspiration
               comes back.
@@ -95,7 +95,7 @@ export default function WelcomePage() {
 
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
             <div
-              className="rounded-[28px] border p-5"
+              className="rounded-[24px] border p-5 sm:rounded-[28px]"
               style={{ backgroundColor: "#fffaf4", borderColor: "rgba(79,37,42,0.14)" }}
             >
               <Lock size={22} color="#f1745e" />
@@ -104,7 +104,7 @@ export default function WelcomePage() {
             </div>
 
             <div
-              className="rounded-[28px] border p-5"
+              className="rounded-[24px] border p-5 sm:rounded-[28px]"
               style={{ backgroundColor: "#fffaf4", borderColor: "rgba(79,37,42,0.14)" }}
             >
               <Sparkles size={22} color="#f1745e" />

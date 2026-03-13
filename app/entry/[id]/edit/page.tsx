@@ -126,7 +126,7 @@ export default function EditEntryPage() {
         className="w-full border-b shadow-sm"
         style={{ backgroundColor: COLORS.top, borderColor: "rgba(255,255,255,0.08)" }}
       >
-        <div className="mx-auto flex max-w-[1440px] items-center justify-end px-6 py-4 lg:px-10">
+        <div className="mx-auto flex max-w-[1440px] items-center justify-end px-4 py-4 sm:px-6 lg:px-10">
           <button
             onClick={handleLogout}
             className="inline-flex items-center gap-2 rounded-full px-5 py-3 text-sm font-bold text-white transition"
@@ -144,11 +144,11 @@ export default function EditEntryPage() {
         </div>
       </header>
 
-      <main className="mx-auto flex w-full max-w-[1440px] flex-1 px-6 py-8 lg:px-10">
+      <main className="mx-auto flex w-full max-w-[1440px] flex-1 px-4 py-6 sm:px-6 sm:py-8 lg:px-10">
         <div className="w-full">
           <button
             onClick={() => router.push(`/entry/${id}`)}
-            className="mb-5 inline-flex items-center gap-2 text-lg font-black transition hover:opacity-75"
+            className="mb-5 inline-flex items-center gap-2 text-base font-black transition hover:opacity-75 sm:text-lg"
             style={{ color: COLORS.text }}
           >
             <ArrowLeft size={20} />
@@ -156,7 +156,7 @@ export default function EditEntryPage() {
           </button>
 
           <div
-            className="overflow-hidden rounded-[36px] border shadow-[0_28px_70px_rgba(79,37,42,0.10)]"
+            className="overflow-hidden rounded-[28px] border shadow-[0_28px_70px_rgba(79,37,42,0.10)] sm:rounded-[36px]"
             style={{ backgroundColor: COLORS.panel, borderColor: COLORS.border }}
           >
             <div
@@ -172,7 +172,7 @@ export default function EditEntryPage() {
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="Title"
-                  className="w-full bg-transparent text-3xl font-black outline-none"
+                  className="w-full bg-transparent text-2xl font-black outline-none sm:text-3xl"
                   style={{ color: COLORS.text }}
                 />
               </div>
@@ -194,7 +194,7 @@ export default function EditEntryPage() {
                       key={emoji}
                       type="button"
                       onClick={() => setSelectedEmoji(emoji)}
-                      className="rounded-2xl border px-4 py-2 text-2xl shadow-sm transition"
+                    className="rounded-2xl border px-3 py-2 text-xl shadow-sm transition sm:px-4 sm:text-2xl"
                       style={{
                         borderColor: active ? COLORS.primary : "rgba(79,37,42,0.12)",
                         backgroundColor: active ? "rgba(241,116,94,0.14)" : "rgba(255,255,255,0.92)",
@@ -218,7 +218,7 @@ export default function EditEntryPage() {
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 placeholder="Start writing here..."
-                className="min-h-[360px] w-full resize-none bg-transparent text-lg leading-8 outline-none sm:min-h-[420px]"
+                className="min-h-[320px] w-full resize-none bg-transparent text-base leading-7 outline-none sm:min-h-[420px] sm:text-lg sm:leading-8"
                 style={{ color: COLORS.text }}
               />
             </div>
@@ -228,7 +228,7 @@ export default function EditEntryPage() {
             <button
               onClick={onSave}
               disabled={saving}
-              className="rounded-full px-12 py-4 text-lg font-black text-white shadow-md transition disabled:opacity-60"
+              className="w-full rounded-full px-8 py-4 text-base font-black text-white shadow-md transition disabled:opacity-60 sm:w-auto sm:px-12 sm:text-lg"
               style={{ backgroundColor: COLORS.primary }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.backgroundColor = COLORS.primaryHover;
