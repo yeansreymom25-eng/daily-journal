@@ -3,13 +3,13 @@
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Eye, EyeOff, Lock, PencilLine } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
@@ -19,7 +19,10 @@ export default function LoginPage() {
     setLoading(true);
     setErrorMessage("");
 
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const { error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
     setLoading(false);
 
@@ -32,33 +35,26 @@ export default function LoginPage() {
   }
 
   return (
-    <div
-      className="min-h-screen"
-      style={{
-        background: "linear-gradient(180deg, #f7e8d0 0%, #ecd3b2 55%, #e5c5a0 100%)",
-      }}
-    >
-      <header
-        className="w-full border-b shadow-sm"
-        style={{ backgroundColor: "#4f252a", borderColor: "rgba(255,255,255,0.08)" }}
-      >
-        <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-5 lg:px-10">
-          <div>
-            <p className="text-sm uppercase tracking-[0.35em] text-white/60">Daily Journal</p>
-            <h1 className="mt-1 text-2xl font-black text-white">Welcome back</h1>
-          </div>
+    <div className="min-h-screen flex flex-col relative overflow-hidden">
+      <div className="absolute inset-0 z-0 bg-gradient-to-br from-[#f7e8d0] via-[#ecd3b2] to-[#f7e8d0]" />
 
-          <div className="flex items-center gap-3">
+      <header className="relative z-10 w-full bg-[#4f252a] border-b border-white/10 shadow-sm">
+        <div className="w-full px-4 sm:px-8 lg:px-10 h-[72px] flex items-center justify-between">
+          <Link href="/" className="text-white font-bold text-lg sm:text-xl tracking-wide">
+            Daily Journal
+          </Link>
+
+          <div className="flex items-center gap-2 sm:gap-4">
             <Link
               href="/"
-              className="rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/15"
+              className="bg-white/10 hover:bg-white/15 text-white text-xs sm:text-sm px-3 sm:px-5 py-2 rounded-lg font-semibold transition"
             >
-              Home
+              Back to Home
             </Link>
+
             <Link
               href="/signup"
-              className="rounded-full px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5"
-              style={{ backgroundColor: "#f1745e" }}
+              className="bg-[#f1745e] hover:bg-[#df624f] text-white text-xs sm:text-sm px-4 sm:px-6 py-2 rounded-lg font-semibold shadow-sm transition"
             >
               Sign Up
             </Link>
@@ -66,118 +62,190 @@ export default function LoginPage() {
         </div>
       </header>
 
-      <main className="mx-auto grid max-w-[1440px] gap-8 px-6 py-10 lg:grid-cols-[0.85fr_1.15fr] lg:px-10">
-        <aside
-          className="rounded-[32px] border p-6 shadow-[0_24px_60px_rgba(79,37,42,0.08)] lg:p-8"
-          style={{ backgroundColor: "#f9efbc", borderColor: "rgba(79,37,42,0.14)" }}
-        >
-          <div
-            className="flex h-16 w-16 items-center justify-center rounded-2xl"
-            style={{ backgroundColor: "#4f252a" }}
+      <main className="relative z-10 flex-1 overflow-hidden">
+        <div className="h-full flex flex-col lg:flex-row">
+          <aside
+            className="relative z-10 w-full lg:w-[420px] bg-[#f9efbc] border-b lg:border-b-0 lg:border-r px-5 sm:px-8 py-8 flex flex-col"
+            style={{ borderColor: "rgba(79,37,42,0.14)" }}
           >
-            <PencilLine size={28} color="#fff" />
-          </div>
-          <h2 className="mt-6 text-3xl font-black text-[#4f252a]">Pick up where you left off.</h2>
-          <p className="mt-4 text-sm leading-7 text-[#7d5953]">
-            Continue writing, revisit drafts, and keep your reflections close in one calm space.
-          </p>
-
-          <div className="mt-8 space-y-4">
-            <div className="rounded-[24px] border bg-white/60 p-5" style={{ borderColor: "rgba(79,37,42,0.14)" }}>
-              <h3 className="text-lg font-black text-[#4f252a]">Private and personal</h3>
-              <p className="mt-2 text-sm leading-6 text-[#7d5953]">Your journal stays focused on you and your thoughts.</p>
-            </div>
-            <div className="rounded-[24px] border bg-white/60 p-5" style={{ borderColor: "rgba(79,37,42,0.14)" }}>
-              <h3 className="text-lg font-black text-[#4f252a]">Draft anytime</h3>
-              <p className="mt-2 text-sm leading-6 text-[#7d5953]">Save unfinished ideas and return when the words feel right.</p>
-            </div>
-          </div>
-        </aside>
-
-        <section
-          className="rounded-[36px] border p-6 shadow-[0_28px_70px_rgba(79,37,42,0.10)] sm:p-8"
-          style={{ backgroundColor: "#fffaf4", borderColor: "rgba(79,37,42,0.14)" }}
-        >
-          <h2 className="text-4xl font-black text-[#4f252a]">Log In</h2>
-          <p className="mt-3 text-sm leading-7 text-[#7d5953]">Enter your details to return to your journal.</p>
-
-          {errorMessage && (
-            <div className="mt-6 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-red-700">
-              {errorMessage}
-            </div>
-          )}
-
-          <form onSubmit={onSubmit} className="mt-6 space-y-5">
-            <div>
-              <label className="mb-2 block text-sm font-bold text-[#4f252a]">Email</label>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-2xl border bg-white px-5 py-3 outline-none focus:ring-2 focus:ring-[#f1745e]/30"
-                style={{ borderColor: "rgba(79,37,42,0.14)" }}
-                required
+            <div className="flex flex-col items-start">
+              <img
+                src="/images/journal.png"
+                alt="Daily Journal"
+                className="w-[90px] sm:w-[110px] h-auto"
+                draggable={false}
               />
+              <h2 className="mt-4 sm:mt-5 text-2xl sm:text-3xl font-extrabold text-[#4f252a]">
+                Welcome back
+              </h2>
+              <p className="mt-2 text-[#4f252a]/80 text-sm sm:text-base leading-relaxed max-w-[46ch]">
+                Log in to continue writing, saving drafts, and tracking your mood.
+              </p>
             </div>
 
-            <div>
-              <label className="mb-2 block text-sm font-bold text-[#4f252a]">Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Enter your password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full rounded-2xl border bg-white px-5 py-3 pr-14 outline-none focus:ring-2 focus:ring-[#f1745e]/30"
-                  style={{ borderColor: "rgba(79,37,42,0.14)" }}
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword((v) => !v)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-[#7d5953]"
-                  aria-label={showPassword ? "Hide password" : "Show password"}
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
+            <div className="mt-6 sm:mt-7 space-y-3">
+              <div className="rounded-2xl border bg-white/55 px-5 py-4" style={{ borderColor: "rgba(79,37,42,0.14)" }}>
+                <div className="flex items-center gap-3 text-[#4f252a] font-bold text-sm sm:text-base">
+                  <span className="text-lg">🔒</span> Private & secure
+                </div>
+                <p className="mt-1 text-[#4f252a]/75 text-xs sm:text-sm">
+                  Your entries stay safe and personal.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border bg-white/55 px-5 py-4" style={{ borderColor: "rgba(79,37,42,0.14)" }}>
+                <div className="flex items-center gap-3 text-[#4f252a] font-bold text-sm sm:text-base">
+                  <span className="text-lg">📝</span> Draft anytime
+                </div>
+                <p className="mt-1 text-[#4f252a]/75 text-xs sm:text-sm">
+                  Save unfinished thoughts and come back later.
+                </p>
+              </div>
+
+              <div className="rounded-2xl border bg-white/55 px-5 py-4" style={{ borderColor: "rgba(79,37,42,0.14)" }}>
+                <div className="flex items-center gap-3 text-[#4f252a] font-bold text-sm sm:text-base">
+                  <span className="text-lg">📱</span> Use anywhere
+                </div>
+                <p className="mt-1 text-[#4f252a]/75 text-xs sm:text-sm">
+                  Phone, tablet, or laptop, your journal follows you.
+                </p>
               </div>
             </div>
 
-            <div className="text-sm">
-              <Link href="/forgot-password" className="font-semibold text-[#4f252a] underline hover:text-[#f1745e]">
-                Forgot Password?
-              </Link>
+            <div className="mt-8 lg:mt-auto pt-2 hidden lg:block">
+              <img
+                src="/images/book-flower.png"
+                alt="Book with flowers"
+                className="w-[300px] xl:w-[320px] h-auto opacity-95"
+                draggable={false}
+              />
             </div>
+          </aside>
 
-            <div className="flex flex-wrap gap-4 pt-2">
-              <button
-                type="submit"
-                disabled={loading}
-                className="rounded-full px-8 py-4 text-sm font-black text-white shadow-md transition disabled:opacity-60"
-                style={{ backgroundColor: "#f1745e" }}
-              >
-                {loading ? "Logging in..." : "Log In"}
-              </button>
+          <section className="relative flex-1 overflow-hidden">
+            <div className="absolute inset-0 z-0 pointer-events-none bg-gradient-to-br from-[#ecd3b2] via-[#f7e8d0] to-[#ecd3b2]" />
+            <div className="absolute -top-28 -right-28 z-0 pointer-events-none h-80 w-80 rounded-full bg-[#f1745e]/20 blur-3xl" />
+            <div className="absolute -bottom-28 left-28 z-0 pointer-events-none h-80 w-80 rounded-full bg-[#f9efbc]/50 blur-3xl" />
 
-              <Link
-                href="/signup"
-                className="rounded-full border px-8 py-4 text-sm font-black text-[#4f252a]"
-                style={{ borderColor: "rgba(79,37,42,0.14)", backgroundColor: "rgba(255,250,244,0.78)" }}
-              >
-                Create Account
-              </Link>
+            <div className="relative z-10 h-full flex items-center justify-center px-4 sm:px-8 py-8 lg:py-10">
+              <div className="w-full max-w-xl lg:max-w-[680px]">
+                <h1 className="text-4xl sm:text-5xl font-extrabold text-[#4f252a] text-center mb-5 sm:mb-6">
+                  Log In
+                </h1>
+
+                <div className="bg-[#fffaf4]/95 backdrop-blur border rounded-3xl p-6 sm:p-8 shadow-xl" style={{ borderColor: "rgba(79,37,42,0.14)" }}>
+                  <p className="text-center text-[#4f252a]/70 mb-5 sm:mb-6 text-sm sm:text-base">
+                    Please enter your login details below
+                  </p>
+
+                  {errorMessage && (
+                    <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm sm:text-base text-red-700">
+                      {errorMessage}
+                    </div>
+                  )}
+
+                  <form onSubmit={onSubmit} className="space-y-4 sm:space-y-5">
+                    <div>
+                      <label className="block text-sm font-bold mb-2 text-[#4f252a]">
+                        Email
+                      </label>
+                      <input
+                        type="email"
+                        placeholder="Enter your email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        className="w-full border rounded-2xl px-4 sm:px-5 py-3 text-sm sm:text-base outline-none focus:ring-2 focus:ring-[#f1745e]/30 bg-white"
+                        style={{ borderColor: "rgba(79,37,42,0.14)" }}
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-sm font-bold mb-2 text-[#4f252a]">
+                        Password
+                      </label>
+
+                      <div className="relative">
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          placeholder="Enter your password"
+                          value={password}
+                          onChange={(e) => setPassword(e.target.value)}
+                          className="w-full border rounded-2xl px-4 sm:px-5 py-3 pr-12 sm:pr-14 text-sm sm:text-base outline-none focus:ring-2 focus:ring-[#f1745e]/30 bg-white"
+                          style={{ borderColor: "rgba(79,37,42,0.14)" }}
+                          required
+                        />
+
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword((v) => !v)}
+                          className="absolute right-4 sm:right-5 top-1/2 -translate-y-1/2 text-base sm:text-lg opacity-80 hover:opacity-100 transition"
+                          aria-label={showPassword ? "Hide password" : "Show password"}
+                        >
+                          {showPassword ? "🙈" : "👁️"}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="text-sm sm:text-base">
+                      <Link
+                        href="/forgot-password"
+                        className="text-[#4f252a] underline font-semibold hover:text-[#f1745e] transition"
+                      >
+                        Forgot Password?
+                      </Link>
+                    </div>
+
+                    <div className="flex justify-center pt-2">
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="w-full sm:w-auto sm:px-20 px-8 py-3 rounded-2xl text-sm sm:text-base font-extrabold text-white shadow-lg hover:shadow-xl hover:-translate-y-0.5 transition disabled:opacity-60"
+                        style={{ background: "linear-gradient(90deg, #f1745e 0%, #df624f 100%)" }}
+                      >
+                        {loading ? "Logging in..." : "Log In"}
+                      </button>
+                    </div>
+
+                    <p className="text-center text-xs sm:text-sm text-[#4f252a]/70 pt-1">
+                      Don&apos;t have an account?{" "}
+                      <Link
+                        href="/signup"
+                        className="text-[#f1745e] underline font-extrabold"
+                      >
+                        Sign Up
+                      </Link>
+                    </p>
+                  </form>
+                </div>
+
+                <div className="mt-6 flex justify-center lg:hidden">
+                  <img
+                    src="/images/book-flower.png"
+                    alt="Book with flowers"
+                    className="w-[260px] sm:w-[300px] h-auto opacity-95"
+                    draggable={false}
+                  />
+                </div>
+              </div>
             </div>
-          </form>
-
-          <div className="mt-8 rounded-[28px] border p-5" style={{ borderColor: "rgba(79,37,42,0.14)", backgroundColor: "rgba(249,239,188,0.45)" }}>
-            <div className="flex items-center gap-3">
-              <Lock size={18} color="#f1745e" />
-              <p className="text-sm font-semibold text-[#4f252a]">Secure access to your writing archive</p>
-            </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </main>
+
+      <footer className="relative z-10 w-full bg-[#4f252a] border-t border-white/10">
+        <div className="w-full px-4 sm:px-8 lg:px-10 py-4 flex flex-wrap items-center justify-center gap-x-10 gap-y-2 text-xs sm:text-sm font-medium text-white">
+          <div className="flex items-center gap-2">
+            <span className="text-base sm:text-lg">🛡️</span> Secure Data
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-base sm:text-lg">💗</span> Free to use
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-base sm:text-lg">📱</span> Sync across devices
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
