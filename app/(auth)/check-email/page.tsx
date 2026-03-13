@@ -1,8 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { MailCheck } from "lucide-react";
 import { Suspense } from "react";
 
 function CheckEmailContent() {
@@ -43,17 +43,24 @@ function CheckEmailContent() {
           className="w-full rounded-[36px] border p-8 text-center shadow-[0_28px_70px_rgba(79,37,42,0.10)]"
           style={{ backgroundColor: "#fffaf4", borderColor: "rgba(79,37,42,0.14)" }}
         >
-          <div
-            className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl"
-            style={{ backgroundColor: "#4f252a" }}
-          >
-            <MailCheck size={28} color="#fff" />
+          <div className="mb-5 flex justify-center">
+            <Image
+              src="/images/check-email.png"
+              alt="Check Email"
+              width={120}
+              height={120}
+              className="w-[110px] sm:w-[120px] h-auto"
+              priority
+            />
           </div>
 
-          <h2 className="mt-6 text-4xl font-black text-[#4f252a]">Check your email</h2>
+          <h2 className="text-4xl font-black text-[#4f252a]">Check your email</h2>
           <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-[#7d5953]">
-            We sent a {isSignup ? "confirmation" : "password reset"} link to your email. Open it to{" "}
-            {isSignup ? "activate your account" : "update your password"}.
+            We sent a {isSignup ? "confirmation" : "password reset"} link to your email.
+            <br />
+            Open it to {isSignup ? "activate your account" : "update your password"}.
+            <br />
+            If you don&apos;t see it, check spam.
           </p>
 
           <div className="mt-8 flex justify-center">
