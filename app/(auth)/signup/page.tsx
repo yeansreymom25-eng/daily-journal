@@ -57,8 +57,7 @@ export default function SignupPage() {
       return;
     }
     if (!data.session) {
-      setMessage("Account created successfully. Please check your email to confirm your account.");
-      router.push("/check-email?type=signup");
+      router.push("/login?signup=success&confirm=email");
       return;
     }
 

@@ -3,18 +3,25 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import bookFlowerImage from "../_assets/book-flower.png";
 import journalImage from "../_assets/journal.png";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const signupMessage =
+    searchParams.get("signup") === "success"
+      ? searchParams.get("confirm") === "email"
+        ? "Account created. Please confirm your email if your account is not active yet, then log in."
+        : "Account created successfully. You can log in now."
+      : "";
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -108,6 +115,11 @@ export default function LoginPage() {
                 <div className="bg-[#fffaf4]/95 backdrop-blur border rounded-[32px] p-6 sm:p-8 shadow-[0_28px_70px_rgba(79,37,42,0.10)]" style={{ borderColor: "rgba(79,37,42,0.14)" }}>
                   <p className="text-center text-[#4f252a]/70 mb-5 sm:mb-6 text-sm sm:text-base">Please enter your login details below</p>
 
+                  {signupMessage && (
+                    <div className="mb-4 rounded-2xl border border-green-200 bg-green-50 px-4 py-3 text-sm sm:text-base text-green-700">
+                      {signupMessage}
+                    </div>
+                  )}
                   {errorMessage && <div className="mb-4 rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm sm:text-base text-red-700">{errorMessage}</div>}
 
                   <form onSubmit={onSubmit} className="space-y-4 sm:space-y-5">
