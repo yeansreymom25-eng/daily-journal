@@ -373,22 +373,6 @@ export default function SettingsPage() {
             />
           </div>
 
-          <div className="mb-8">
-            <label className="block mb-2 font-semibold text-gray-800">
-              Profile Picture URL
-            </label>
-            <input
-              type="url"
-              value={avatarUrl}
-              onChange={(e) => setAvatarUrl(e.target.value)}
-              placeholder="https://example.com/your-photo.jpg"
-              className="w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#f1745e]"
-            />
-            <p className="mt-2 text-sm text-gray-500">
-              Optional fallback if you prefer using an external image link.
-            </p>
-          </div>
-
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <button
               className="px-6 py-3 rounded-lg text-white font-bold disabled:opacity-60"
