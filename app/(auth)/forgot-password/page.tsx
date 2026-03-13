@@ -62,7 +62,10 @@ export default function ForgotPasswordPage() {
       </header>
 
       <main className="relative z-10 flex flex-1 overflow-hidden">
-        <aside className="hidden md:flex relative z-10 w-[420px] bg-[#fbe3b9] border-r border-[#e6c9a4] px-8 py-8 flex-col overflow-hidden">
+        <aside
+          className="hidden md:flex relative z-10 w-[420px] bg-[#f9efbc] border-r px-8 py-8 flex-col overflow-hidden"
+          style={{ borderColor: "rgba(79,37,42,0.14)" }}
+        >
           <div className="flex flex-col items-start">
             <img
               src="/images/journal.png"
@@ -78,7 +81,7 @@ export default function ForgotPasswordPage() {
           </div>
 
           <div className="mt-7 space-y-3">
-            <div className="rounded-2xl border border-black/10 bg-white/55 px-5 py-4">
+            <div className="rounded-2xl border bg-white/55 px-5 py-4" style={{ borderColor: "rgba(79,37,42,0.14)" }}>
               <div className="flex items-center gap-3 text-[#4f252a] font-bold text-base">
                 <span className="text-lg">🔑</span> Secure recovery
               </div>

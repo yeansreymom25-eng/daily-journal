@@ -64,7 +64,10 @@ export default function LoginPage() {
 
       <main className="relative z-10 flex-1 overflow-hidden">
         <div className="h-full flex flex-col lg:flex-row">
-          <aside className="relative z-10 w-full lg:w-[420px] bg-[#fbe3b9] border-b lg:border-b-0 lg:border-r border-[#e6c9a4] px-5 sm:px-8 py-8 flex flex-col">
+          <aside
+            className="relative z-10 w-full lg:w-[420px] bg-[#f9efbc] border-b lg:border-b-0 lg:border-r px-5 sm:px-8 py-8 flex flex-col"
+            style={{ borderColor: "rgba(79,37,42,0.14)" }}
+          >
             <div className="flex flex-col items-start">
               <img
                 src="/images/journal.png"
@@ -81,7 +84,7 @@ export default function LoginPage() {
             </div>
 
             <div className="mt-6 sm:mt-7 space-y-3">
-              <div className="rounded-2xl border border-black/10 bg-white/55 px-5 py-4">
+              <div className="rounded-2xl border bg-white/55 px-5 py-4" style={{ borderColor: "rgba(79,37,42,0.14)" }}>
                 <div className="flex items-center gap-3 text-[#4f252a] font-bold text-sm sm:text-base">
                   <span className="text-lg">🔒</span> Private & secure
                 </div>
@@ -90,7 +93,7 @@ export default function LoginPage() {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-black/10 bg-white/55 px-5 py-4">
+              <div className="rounded-2xl border bg-white/55 px-5 py-4" style={{ borderColor: "rgba(79,37,42,0.14)" }}>
                 <div className="flex items-center gap-3 text-[#4f252a] font-bold text-sm sm:text-base">
                   <span className="text-lg">📝</span> Draft anytime
                 </div>
@@ -99,7 +102,7 @@ export default function LoginPage() {
                 </p>
               </div>
 
-              <div className="rounded-2xl border border-black/10 bg-white/55 px-5 py-4">
+              <div className="rounded-2xl border bg-white/55 px-5 py-4" style={{ borderColor: "rgba(79,37,42,0.14)" }}>
                 <div className="flex items-center gap-3 text-[#4f252a] font-bold text-sm sm:text-base">
                   <span className="text-lg">📱</span> Use anywhere
                 </div>
