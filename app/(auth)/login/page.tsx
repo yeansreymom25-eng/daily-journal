@@ -2,26 +2,37 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import bookFlowerImage from "../_assets/book-flower.png";
 import journalImage from "../_assets/journal.png";
 
 export default function LoginPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
-  const signupMessage =
-    searchParams.get("signup") === "success"
-      ? searchParams.get("confirm") === "email"
+  const [signupMessage, setSignupMessage] = useState("");
+
+  useEffect(() => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const isSignupSuccess = searchParams.get("signup") === "success";
+    const requiresEmailConfirmation = searchParams.get("confirm") === "email";
+
+    if (!isSignupSuccess) {
+      setSignupMessage("");
+      return;
+    }
+
+    setSignupMessage(
+      requiresEmailConfirmation
         ? "Account created. Please confirm your email if your account is not active yet, then log in."
         : "Account created successfully. You can log in now."
-      : "";
+    );
+  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
