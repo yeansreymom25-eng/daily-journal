@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
+import { MailCheck } from "lucide-react";
 import { Suspense } from "react";
 
 function CheckEmailContent() {
@@ -10,90 +11,81 @@ function CheckEmailContent() {
   const isSignup = type === "signup";
 
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-[#fbe3b9] via-[#edd0ac] to-[#fbe3b9]" />
+    <div
+      className="min-h-screen"
+      style={{
+        background: "linear-gradient(180deg, #f7e8d0 0%, #ecd3b2 55%, #e5c5a0 100%)",
+      }}
+    >
+      <header
+        className="w-full border-b shadow-sm"
+        style={{ backgroundColor: "#4f252a", borderColor: "rgba(255,255,255,0.08)" }}
+      >
+        <div className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-5 lg:px-10">
+          <div>
+            <p className="text-sm uppercase tracking-[0.35em] text-white/60">Daily Journal</p>
+            <h1 className="mt-1 text-2xl font-black text-white">Check your email</h1>
+          </div>
 
-      <header className="relative w-full bg-[#4f252a] border-b border-[#3a1b1f] shadow-md">
-        <div className="w-full px-4 sm:px-6 md:px-10 py-5 flex items-center justify-between">
-          <Link href="/" className="text-white font-bold text-xl tracking-wide">
-            Daily Journal
-          </Link>
-
-          <div className="flex items-center gap-3 sm:gap-4">
+          <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className="bg-white/10 hover:bg-white/15 text-white text-sm px-4 sm:px-5 py-2 rounded-lg font-semibold transition"
+              className="rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/15"
             >
               Back to Login
-            </Link>
-
-            <Link
-              href="/signup"
-              className="bg-[#e06464] hover:bg-[#f1745e] text-white text-sm px-4 sm:px-6 py-2 rounded-lg font-semibold shadow-sm transition"
-            >
-              Sign Up
             </Link>
           </div>
         </div>
       </header>
 
-      <main className="relative flex-1 flex items-center justify-center px-4 sm:px-6">
-        <div className="w-full max-w-[620px]">
-          <div className="bg-white/80 backdrop-blur border border-black/15 rounded-2xl shadow-xl px-6 sm:px-10 py-10 text-center">
-            <div className="flex justify-center mb-5">
-              <img
-                src="/images/check-email.png"
-                alt="Check Email"
-                className="w-[110px] sm:w-[120px] h-auto"
-              />
-            </div>
+      <main className="mx-auto flex min-h-[calc(100vh-89px)] max-w-[900px] items-center px-6 py-12 lg:px-10">
+        <div
+          className="w-full rounded-[36px] border p-8 text-center shadow-[0_28px_70px_rgba(79,37,42,0.10)]"
+          style={{ backgroundColor: "#fffaf4", borderColor: "rgba(79,37,42,0.14)" }}
+        >
+          <div
+            className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl"
+            style={{ backgroundColor: "#4f252a" }}
+          >
+            <MailCheck size={28} color="#fff" />
+          </div>
 
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#4f252a] mb-4">
-              Check your email
-            </h1>
+          <h2 className="mt-6 text-4xl font-black text-[#4f252a]">Check your email</h2>
+          <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-[#7d5953]">
+            We sent a {isSignup ? "confirmation" : "password reset"} link to your email. Open it to{" "}
+            {isSignup ? "activate your account" : "update your password"}.
+          </p>
 
-            <p className="text-[#4f252a]/80 text-base leading-relaxed max-w-[460px] mx-auto mb-8">
-              We sent a {isSignup ? "confirmation" : "password reset"} link to your email.
-              <br />
-              Open the email to {isSignup ? "activate your account" : "update your password"}.
-              <br />
-              If you don’t see it, check spam.
-            </p>
-
+          <div className="mt-8 flex justify-center">
             <Link
               href="/login"
-              className="inline-flex items-center justify-center px-10 sm:px-12 py-4 rounded-xl text-white font-extrabold bg-[#e06464] hover:bg-[#f1745e] transition shadow-sm"
+              className="rounded-full px-8 py-4 text-sm font-black text-white shadow-md transition"
+              style={{ backgroundColor: "#f1745e" }}
             >
               Back to Login
             </Link>
           </div>
         </div>
       </main>
-
-      <footer className="relative w-full bg-[#4f252a] border-t border-[#3a1b1f]">
-        <div className="w-full px-4 sm:px-6 md:px-10 py-5 flex items-center justify-center gap-6 sm:gap-10 md:gap-16 text-xs sm:text-sm font-medium text-white">
-          <div className="flex items-center gap-2">
-            <span className="text-lg">🛡️</span> Secure Data
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-lg">💗</span> Free to use
-          </div>
-          <div className="hidden sm:flex items-center gap-2">
-            <span className="text-lg">📱</span> Sync across devices
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
 
 export default function CheckEmailPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-[#fbe3b9] text-[#4f252a] font-bold text-xl">
-        Loading...
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div
+          className="min-h-screen flex items-center justify-center font-bold text-xl"
+          style={{
+            background: "linear-gradient(180deg, #f7e8d0 0%, #ecd3b2 55%, #e5c5a0 100%)",
+            color: "#4f252a",
+          }}
+        >
+          Loading...
+        </div>
+      }
+    >
       <CheckEmailContent />
     </Suspense>
   );

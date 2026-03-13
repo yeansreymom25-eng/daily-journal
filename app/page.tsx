@@ -1,29 +1,35 @@
 import Link from "next/link";
+import { ArrowRight, BookOpen, Lock, Sparkles } from "lucide-react";
 
 export default function WelcomePage() {
   return (
-    <div className="min-h-screen flex flex-col relative overflow-hidden">
+    <div
+      className="min-h-screen"
+      style={{
+        background: "linear-gradient(180deg, #f7e8d0 0%, #ecd3b2 55%, #e5c5a0 100%)",
+      }}
+    >
+      <header
+        className="w-full border-b shadow-sm"
+        style={{ backgroundColor: "#4f252a", borderColor: "rgba(255,255,255,0.08)" }}
+      >
+        <nav className="mx-auto flex max-w-[1440px] items-center justify-between px-6 py-5 lg:px-10">
+          <div>
+            <p className="text-sm uppercase tracking-[0.35em] text-white/60">Daily Journal</p>
+            <h1 className="mt-1 text-2xl font-black text-white">A home for your reflections</h1>
+          </div>
 
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-[#fbe3b9] via-[#edd0ac] to-[#fbe3b9]" />
-
-      {/* TOP BAR */}
-      <header className="relative w-full bg-[#4f252a] border-b border-[#3a1b1f] shadow-md">
-        <nav className="mx-auto max-w-6xl px-10 py-6 flex items-center justify-end">
-
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3">
             <Link
               href="/login"
-              className="px-6 py-3 rounded-xl bg-white/20 hover:bg-white/30
-              text-white font-semibold transition"
+              className="rounded-full border border-white/20 bg-white/10 px-5 py-3 text-sm font-bold text-white transition hover:bg-white/15"
             >
               Login
             </Link>
-
             <Link
               href="/signup"
-              className="px-6 py-3 rounded-xl bg-[#e06464] hover:bg-[#f1745e]
-              text-white font-semibold shadow-md transition"
+              className="rounded-full px-5 py-3 text-sm font-bold text-white transition hover:-translate-y-0.5"
+              style={{ backgroundColor: "#f1745e" }}
             >
               Sign Up
             </Link>
@@ -31,55 +37,83 @@ export default function WelcomePage() {
         </nav>
       </header>
 
-      {/* MAIN */}
-      <main className="relative flex-1 flex flex-col items-center justify-center text-center px-6 py-14">
-        <img
-          src="/images/journal.png"
-          alt="Daily Journal"
-          className="w-[300px] h-auto mb-8"
-        />
-
-        <p className="text-lg text-[#4f252a]/80">Welcome to</p>
-
-        <h1 className="text-6xl sm:text-7xl font-extrabold text-[#4f252a] mt-3">
-          Daily Journal
-        </h1>
-
-        <p className="text-[#4f252a]/80 mt-6 text-2xl max-w-2xl">
-          Write your thoughts and track your mood every day.
-        </p>
-
-        <Link
-          href="/signup"
-          className="mt-12 inline-flex items-center justify-center gap-2 
-                     px-16 py-6 rounded-3xl 
-                     bg-gradient-to-r from-[#e06464] to-[#f1745e]
-                     text-white text-xl font-bold 
-                     shadow-lg hover:-translate-y-1 transition"
+      <main className="mx-auto grid max-w-[1440px] gap-8 px-6 py-10 lg:grid-cols-[1.2fr_0.8fr] lg:px-10">
+        <section
+          className="rounded-[36px] border p-8 shadow-[0_28px_70px_rgba(79,37,42,0.10)] lg:p-12"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(255,250,244,0.96) 0%, rgba(251,243,185,0.86) 100%)",
+            borderColor: "rgba(79,37,42,0.14)",
+          }}
         >
-          Get Started →
-        </Link>
+          <p className="text-sm font-semibold uppercase tracking-[0.3em] text-[#7d5953]">Welcome</p>
+          <h2 className="mt-3 max-w-3xl text-5xl font-black leading-tight text-[#4f252a] lg:text-7xl">
+            Write slowly, remember deeply, and keep every thought close.
+          </h2>
+          <p className="mt-6 max-w-2xl text-lg leading-8 text-[#7d5953]">
+            Daily Journal gives you one calm space for reflections, moods, unfinished drafts, and the
+            moments you want to revisit later.
+          </p>
+
+          <div className="mt-8 flex flex-wrap gap-4">
+            <Link
+              href="/signup"
+              className="inline-flex items-center gap-2 rounded-full px-6 py-4 text-base font-black text-white shadow-md transition hover:-translate-y-0.5"
+              style={{ backgroundColor: "#f1745e" }}
+            >
+              Get Started
+              <ArrowRight size={18} />
+            </Link>
+
+            <Link
+              href="/login"
+              className="rounded-full border px-6 py-4 text-base font-black text-[#4f252a] transition"
+              style={{ backgroundColor: "#fffaf4", borderColor: "rgba(79,37,42,0.14)" }}
+            >
+              Continue Writing
+            </Link>
+          </div>
+        </section>
+
+        <aside className="space-y-5">
+          <div
+            className="rounded-[32px] border p-6 shadow-[0_24px_60px_rgba(79,37,42,0.08)]"
+            style={{ backgroundColor: "#f9efbc", borderColor: "rgba(79,37,42,0.14)" }}
+          >
+            <div
+              className="flex h-16 w-16 items-center justify-center rounded-2xl"
+              style={{ backgroundColor: "#4f252a" }}
+            >
+              <BookOpen size={28} color="#fff" />
+            </div>
+            <h3 className="mt-5 text-2xl font-black text-[#4f252a]">Built for daily writing</h3>
+            <p className="mt-3 text-sm leading-7 text-[#7d5953]">
+              Capture quick thoughts, shape longer entries, and return to drafts whenever inspiration
+              comes back.
+            </p>
+          </div>
+
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-1">
+            <div
+              className="rounded-[28px] border p-5"
+              style={{ backgroundColor: "#fffaf4", borderColor: "rgba(79,37,42,0.14)" }}
+            >
+              <Lock size={22} color="#f1745e" />
+              <h4 className="mt-4 text-xl font-black text-[#4f252a]">Private by default</h4>
+              <p className="mt-2 text-sm leading-6 text-[#7d5953]">Your personal writing stays in one secure place.</p>
+            </div>
+
+            <div
+              className="rounded-[28px] border p-5"
+              style={{ backgroundColor: "#fffaf4", borderColor: "rgba(79,37,42,0.14)" }}
+            >
+              <Sparkles size={22} color="#f1745e" />
+              <h4 className="mt-4 text-xl font-black text-[#4f252a]">Thoughtful and calm</h4>
+              <p className="mt-2 text-sm leading-6 text-[#7d5953]">A softer workspace that keeps focus on the writing itself.</p>
+            </div>
+          </div>
+        </aside>
       </main>
-
-      {/*OOTER */}
-      <footer className="relative w-full bg-[#4f252a] border-t border-[#3a1b1f]">
-        <div className="mx-auto max-w-6xl px-10 py-6 flex items-center justify-center gap-20 text-lg font-medium text-white">
-
-          <div className="flex items-center gap-3">
-            🔒 <span>Secure Data</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            💗 <span>Free to use</span>
-          </div>
-
-          <div className="flex items-center gap-3">
-            🔄 <span>Sync across devices</span>
-          </div>
-
-        </div>
-      </footer>
-
     </div>
   );
 }
